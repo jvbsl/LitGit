@@ -10,7 +10,7 @@ $TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 
 $TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY"
 $OUTPUT_DIR="$TOOL_DIRECTORY"
-$CONFIG_FILE="$TOOL_DIRECTORY/GitVersion.config"
+$CONFIG_FILE="$TOOL_DIRECTORY/LitGit.config"
 
 
 
@@ -92,7 +92,7 @@ if ($OUTPUT_FILES.Length -gt $TEMPLATE_FILES.Length)
 }
 if ($TEMPLATE_FILES.Length -eq 0)
 {
-	$TEMPLATE_FILES=(Get-ChildItem "$TEMPLATE_SEARCH_DIR/" -Filter "*.template")
+	$TEMPLATE_FILES+=(Get-ChildItem "$TEMPLATE_SEARCH_DIR/" -Filter "*.template")
 }
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 {
