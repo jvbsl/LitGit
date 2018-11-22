@@ -8,7 +8,7 @@
         <ScriptFileEnding Condition="'$(OS)' == 'Windows_NT'" >.ps1</ScriptFileEnding>
         <ScriptFileEnding Condition="'$(OS)' != 'Windows_NT'" ></ScriptFileEnding>
 
-        <LitGit>$(ScriptExe) ../tools/LitGit$(ScriptFileEnding)</LitGit>
+        <LitGit>$(ScriptExe) $(MSBuildThisFileDirectory)../tools/LitGit$(ScriptFileEnding)</LitGit>
     </PropertyGroup>
     <ItemGroup>
         <AvailableItemName Include="LitGitTemplateReference" />
