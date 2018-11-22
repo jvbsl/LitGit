@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>${NUGET_ID}</id>
+        <version>${VERSION_SHORT_REV_ADD}</version>
+        <title>${NUGET_TITLE}</title>
+        <authors>${AUTHORS}</authors>
+        <projectUrl>${PROJECT_URL}</projectUrl>
+        <requireLicenseAcceptance>${NUGET_REQUIRESLICENSEACCEPTANCE}</requireLicenseAcceptance>
+        <description>${DESCRIPTION}</description>
+    </metadata>
+
+    <files>
+        <!-- LitGit Tool -->
+        <file src=".\LitGit" target="tools\LitGit" />
+        <file src="./LitGit" target="tools/LitGit" />
+        <file src=".\LitGit.ps1" target="tools\" />
+        <file src="./LitGit.ps1" target="tools/" />
+        <!-- Targets -->
+        <file src="LitGit.targets" target="build" />
+    </files>
+</package>
