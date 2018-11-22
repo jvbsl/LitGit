@@ -121,7 +121,7 @@ echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-BUILD=$(git log --oneline $MATCHING_COMMIT... | wc -l)
+BUILD=$(git log --no-merges --oneline $MATCHING_COMMIT... | wc -l)
 
 if [[ $LAST_TAG =~ "-"  ]];
 then

@@ -122,7 +122,7 @@ echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 
 $CURRENT_BRANCH=(git rev-parse --abbrev-ref HEAD)
 
-$BUILD=(git log --oneline $MATCHING_COMMIT... | Measure-Object –Line).Lines
+$BUILD=(git log --no-merges --oneline $MATCHING_COMMIT... | Measure-Object –Line).Lines
 
 if ($LAST_TAG -Match "-")
 {
