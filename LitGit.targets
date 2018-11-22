@@ -5,10 +5,10 @@
         <ScriptExe Condition="'$(OS)' == 'Windows_NT'" >powershell</ScriptExe>
         <ScriptExe Condition="'$(OS)' != 'Windows_NT'" ></ScriptExe>
 
-        <ScriptFileEnding Condition="'$(OS)' == 'Windows_NT'" >ps1</ScriptFileEnding>
-        <ScriptFileEnding Condition="'$(OS)' != 'Windows_NT'" >sh</ScriptFileEnding>
+        <ScriptFileEnding Condition="'$(OS)' == 'Windows_NT'" >.ps1</ScriptFileEnding>
+        <ScriptFileEnding Condition="'$(OS)' != 'Windows_NT'" ></ScriptFileEnding>
 
-        <LitGit>$(ScriptExe) ../Versioning/GitVersion.$(ScriptFileEnding)</LitGit>
+        <LitGit>$(ScriptExe) ../tools/LitGit$(ScriptFileEnding)</LitGit>
     </PropertyGroup>
     <ItemGroup>
         <AvailableItemName Include="LitGitTemplateReference" />
