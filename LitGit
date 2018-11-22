@@ -1,0 +1,215 @@
+#!/bin/bash
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  TOOL_DIRECTORY="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$TOOL_DIRECTORY/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+TOOL_DIRECTORY="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
+
+TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY/Templates"
+OUTPUT_DIR="$TOOL_DIRECTORY"
+CONFIG_FILE="$TOOL_DIRECTORY/GitVersion.config"
+
+TEMPLATE_FILES=()
+OUTPUT_FILES=()
+PARSING_TEMPLATE_FILES=false
+PARSING_OUTPUT_FILES=false
+
+for i in "$@"
+do
+case $i in
+
+    -h|--help)
+    echo -e "Usage: LitGit [options]"
+    echo -e "Extracts meta information from git. Like version information from tag and commit. Authors and many more."
+    echo -e "see https://github.com/jvbsl/LitGit"
+    echo ""
+    echo -e "Options:"
+    echo -e "\t-c, --config\t\t\t\t\tPath to a LitGit configuration file: see https://github.com/jvbsl/LitGit"
+    echo -e "\t-s, --searchpath\t\t\t\tPath to a directory in which to search for *.template files. Default is directory of script."
+    echo -e "\t-d, --destination-dir\t\t\t\tThe output directory to which the templated files are written, if not specified otherwise by (-o | --outputs)."
+    echo -e "\t-t, --templates\t<templatefile1> <templatefile2>\tSpecific *.template files to process corresponding to a specific outputfile declaration."
+    echo -e "\t\t\t\t\t\t\t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
+    echo -e "\t\t\t\t\t\t\t   and the output directory is the specified or default (-d | --destination-dir)."
+    echo -e "\t-o, --outputs\t<outputfile1>   <outputfile2>\tThe output files generated from the corresponding template files. see (-t | --templates)."
+    exit 0
+    ;;
+    -c|--config)
+	PARSING_TEMPLATE_FILES=false
+	PARSING_OUTPUT_FILES=false
+    CONFIG_FILE="$2"
+	if [ ! -f "$CONFIG_FILE" ]; then { echo >&2 "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1; } fi
+    shift
+	shift
+    ;;
+    -s|--searchpath)
+	PARSING_TEMPLATE_FILES=false
+	PARSING_OUTPUT_FILES=false
+    TEMPLATE_SEARCH_DIR="$2"
+	if [ ! -d "$TEMPLATE_SEARCH_DIR" ]; then { echo >&2 "Error: Template search directory '$TEMPLATE_SEARCH_DIR' not found! Aborting." ; exit 1; } fi
+    shift
+	shift
+    ;;
+    -d|--destination-dir)
+	PARSING_TEMPLATE_FILES=false
+	PARSING_OUTPUT_FILES=false
+    OUTPUT_DIR="$2"
+	mkdir -p "$OUTPUT_DIR" || { echo >&2 "Error: Could not create output directory '$OUTPUT_DIR'. Aborting."; exit 1; }
+    shift
+	shift
+    ;;
+    -t|--templates)
+	PARSING_TEMPLATE_FILES=true
+	PARSING_OUTPUT_FILES=false
+	shift
+    ;;
+    -o|--outputs)
+	PARSING_TEMPLATE_FILES=false
+	PARSING_OUTPUT_FILES=true
+	shift
+    ;;
+    *)
+    	if [ "$PARSING_TEMPLATE_FILES" = true ];
+		then
+			TEMPLATE_FILES+=("$1")
+			shift
+		elif [ "$PARSING_OUTPUT_FILES" = true ];
+		then
+			OUTPUT_FILES+=("$1")
+			shift
+		elif [ ! -z $1 ];
+		then
+			{ echo >&2 "Error: Invalid Argument: '$1! Aborting." ; exit 1; }
+		fi
+    ;;
+esac
+done
+if [ ${#OUTPUT_FILES[@]} -gt ${#TEMPLATE_FILES[@]} ];
+then
+	{ echo >&2 "Error: Too many output files specified! Aborting." ; exit 1; }
+fi
+if [ ${#TEMPLATE_FILES[@]} -eq 0 ]; then
+	TEMPLATE_FILES=($TEMPLATE_SEARCH_DIR/*.template)
+fi
+
+for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
+	[ -f "${TEMPLATE_FILES[$i]}" ] || continue
+	if [ ${#OUTPUT_FILES[@]} -le $i ];
+	then
+		if [ ! -f "${TEMPLATE_FILES[$i]}" ]; then { echo >&2 "Error: Template file '${TEMPLATE_FILES[$i]}' not found! Aborting." ; exit 1; } fi
+		OUTPUT_FILE=${TEMPLATE_FILES[$i]}
+		OUTPUT_FILE="${OUTPUT_FILE%.*}"
+		OUTPUT_FILE=${OUTPUT_FILE##*/}
+		OUTPUT_FILES[$i]="$OUTPUT_DIR/$OUTPUT_FILE"
+	fi
+done
+
+
+
+command -v git >/dev/null 2>&1 || { echo >&2 "Error: git command not found in PATH. Aborting."; exit 1; }
+
+
+git show >/dev/null 2>&1 || { echo >&2 "Error: no git repository found in path. Aborting."; exit 1; }
+
+LAST_TAG=$(git describe --abbrev=0 --tags)
+MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
+echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+
+# git cat-file -p $MATCHING_COMMIT
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+BUILD=$(git log --oneline $MATCHING_COMMIT... | wc -l)
+
+if [[ $LAST_TAG =~ "-"  ]];
+then
+	TEMP=${LAST_TAG#*\-} 
+	BASE_VERSION=${LAST_TAG%"-$TEMP"}
+	if [ ! -z "$TEMP" ];
+	then
+		ADDITIONAL="-$TEMP"
+	fi
+
+else
+
+	if [ "$CURRENT_BRANCH" = "master" ];
+	then
+		ADDITIONAL=""
+
+	else
+
+		ADDITIONAL="-alpha"
+	fi
+	BASE_VERSION=$LAST_TAG
+fi
+
+VERSION_SHORT=$BASE_VERSION$ADDITIONAL
+VERSION_SHORT_REV=$BASE_VERSION.$BUILD
+VERSION_SHORT_REV_ADD=$VERSION_SHORT_REV$ADDITIONAL
+
+INFORMATIONAL_VERSION=$VERSION_SHORT_REV_ADD+$CURRENT_BRANCH:$MATCHING_COMMIT
+
+INITIAL_COMMIT=$(git rev-list --max-parents=0 HEAD)
+
+REMOTE_URL=$(git remote get-url --all origin | head -n 1)
+
+if [[ $REMOTE_URL =~ "@" ]];
+then
+	TEMP=${REMOTE_URL#*@}
+	REMOTE_URL_HTTPS=https://${TEMP/:/\/}
+	REMOTE_URL_SSH=$REMOTE_URL
+
+else
+
+	REMOTE_URL_HTTPS=$REMOTE_URL
+fi
+
+YEAR=$(date +"%Y")
+# SET DEFAULT VALUES
+PRODUCT=$(basename -s .git `git config --get remote.origin.url`) # 
+#AUTHORS=$(git log --all --format='%aN %cE' | sort -u)
+AUTHORS=$(git --no-pager show -s --format='%an' $INITIAL_COMMIT) # Author of initiial commit
+COMPANY="$AUTHORS"
+PROJECT_URL="$REMOTE_URL"
+COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
+DESCRIPTION=""
+
+# copied from https://stackoverflow.com/questions/415677/how-to-replace-placeholders-in-a-text-file/40167919#40167919
+expandVarsStrict(){
+  local line lineEscaped
+  while IFS= read -r line || [[ -n $line ]]; do  # the `||` clause ensures that the last line is read even if it doesn't end with \n
+    # Escape ALL chars. that could trigger an expansion..
+    IFS= read -r -d '' lineEscaped < <(printf %s "$line" | tr '`([$' '\1\2\3\4')
+    # ... then selectively reenable ${ references
+    lineEscaped=${lineEscaped//$'\4'{/\${}
+    # Finally, escape embedded double quotes to preserve them.
+    lineEscaped=${lineEscaped//\"/\\\"}
+    eval "printf '%s\n' \"$lineEscaped\"" | tr '\1\2\3\4' '`([$'
+  done
+}
+
+
+
+IFS="="
+while read -r name value
+do
+	if [ ! -z "$name" ];
+	then
+		expanded=$(expandVarsStrict <<< "${value//\"/}")
+		#expanded=$(echo $expanded)	
+		expanded=$(echo "'$expanded'")
+		eval $name=$expanded
+
+	fi
+done < "$CONFIG_FILE"
+
+for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
+	INPUT_FILE=${TEMPLATE_FILES[$i]}
+	[ -f "$INPUT_FILE" ] || continue
+	OUTPUT_FILE=${OUTPUT_FILES[$i]}
+
+	echo "Create templated file $OUTPUT_FILE..."
+	expandVarsStrict < "$INPUT_FILE" >"$OUTPUT_FILE"
+done
