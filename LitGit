@@ -121,7 +121,7 @@ echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-BUILD=$(git log --oneline $MATCHING_COMMIT... | wc -l)
+BUILD=$(git log --no-merges --oneline $MATCHING_COMMIT... | wc -l)
 
 if [[ $LAST_TAG =~ "-"  ]];
 then
@@ -153,7 +153,7 @@ INFORMATIONAL_VERSION=$VERSION_SHORT_REV_ADD+$CURRENT_BRANCH:$MATCHING_COMMIT
 
 INITIAL_COMMIT=$(git rev-list --max-parents=0 HEAD)
 
-REMOTE_URL=$(git remote get-url --all origin | head -n 1)
+REMOTE_URL=$(git remote get-url --all origin 2> /dev/null | head -n 1)
 
 if [[ $REMOTE_URL =~ "@" ]];
 then
@@ -191,19 +191,21 @@ expandVarsStrict(){
 }
 
 
+if [ -f "$CONFIG_FILE" ];
+then
+    IFS="="
+    while read -r name value
+    do
+	    if [ ! -z "$name" ];
+	    then
+		    expanded=$(expandVarsStrict <<< "${value//\"/}")
+		    #expanded=$(echo $expanded)	
+		    expanded=$(echo "'$expanded'")
+		    eval $name=$expanded
 
-IFS="="
-while read -r name value
-do
-	if [ ! -z "$name" ];
-	then
-		expanded=$(expandVarsStrict <<< "${value//\"/}")
-		#expanded=$(echo $expanded)	
-		expanded=$(echo "'$expanded'")
-		eval $name=$expanded
-
-	fi
-done < "$CONFIG_FILE"
+	    fi
+    done < "$CONFIG_FILE"
+fi
 
 for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
 	INPUT_FILE=${TEMPLATE_FILES[$i]}

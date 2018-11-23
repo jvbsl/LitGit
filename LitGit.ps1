@@ -122,7 +122,7 @@ echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 
 $CURRENT_BRANCH=(git rev-parse --abbrev-ref HEAD)
 
-$BUILD=(git log --oneline $MATCHING_COMMIT... | Measure-Object –Line).Lines
+$BUILD=(git log --no-merges --oneline $MATCHING_COMMIT... | Measure-Object –Line).Lines
 
 if ($LAST_TAG -Match "-")
 {
@@ -154,7 +154,7 @@ $INFORMATIONAL_VERSION="$VERSION_SHORT_REV_ADD+${CURRENT_BRANCH}:$MATCHING_COMMI
 
 $INITIAL_COMMIT=(git rev-list --max-parents=0 HEAD)
 
-$REMOTE_URL=(git remote get-url --all origin | select -first 1)
+$REMOTE_URL=((git remote get-url --all origin 2> $null) | select -first 1)
 
 if ($REMOTE_URL -Match "@")
 {

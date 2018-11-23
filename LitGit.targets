@@ -8,7 +8,7 @@
         <ScriptFileEnding Condition="'$(OS)' == 'Windows_NT'" >.ps1</ScriptFileEnding>
         <ScriptFileEnding Condition="'$(OS)' != 'Windows_NT'" ></ScriptFileEnding>
 
-        <LitGit>$(ScriptExe) ../tools/LitGit$(ScriptFileEnding)</LitGit>
+        <LitGit>$(ScriptExe) $(MSBuildThisFileDirectory)../tools/LitGit$(ScriptFileEnding)</LitGit>
     </PropertyGroup>
     <ItemGroup>
         <AvailableItemName Include="LitGitTemplateReference" />
@@ -18,7 +18,7 @@
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
     <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent">
-        <Exec Command="$(LitGit) -t %(LitGitTemplates.FullPath) -d $(MSBuildThisFileDirectory)" />
+        <Exec Command="$(LitGit) -t %(LitGitTemplates.FullPath)" />
     </Target>
 
 </Project>
