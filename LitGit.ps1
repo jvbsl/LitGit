@@ -154,7 +154,7 @@ $INFORMATIONAL_VERSION="$VERSION_SHORT_REV_ADD+${CURRENT_BRANCH}:$MATCHING_COMMI
 
 $INITIAL_COMMIT=(git rev-list --max-parents=0 HEAD)
 
-$REMOTE_URL=(git remote get-url --all origin | select -first 1)
+$REMOTE_URL=((git remote get-url --all origin 2> $null) | select -first 1)
 
 if ($REMOTE_URL -Match "@")
 {
