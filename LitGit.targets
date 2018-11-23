@@ -18,7 +18,7 @@
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
     <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent">
-        <Exec Command="$(LitGit) -t %(LitGitTemplates.FullPath) -d $(MSBuildThisFileDirectory)" />
+        <Exec Command="$(LitGit) -t %(LitGitTemplates.FullPath)" />
     </Target>
 
 </Project>
