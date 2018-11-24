@@ -9,7 +9,6 @@ done
 TOOL_DIRECTORY="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
 
 TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY"
-OUTPUT_DIR="$TOOL_DIRECTORY"
 CONFIG_FILE="$TOOL_DIRECTORY/LitGit.config"
 
 TEMPLATE_FILES=()
@@ -99,10 +98,17 @@ for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
 	if [ ${#OUTPUT_FILES[@]} -le $i ];
 	then
 		if [ ! -f "${TEMPLATE_FILES[$i]}" ]; then { echo >&2 "Error: Template file '${TEMPLATE_FILES[$i]}' not found! Aborting." ; exit 1; } fi
-		OUTPUT_FILE=${TEMPLATE_FILES[$i]}
+        
+        OUTPUT_FILE=${TEMPLATE_FILES[$i]}
+        if [ -z ${var+x} ];
+        then
+            TEMP_OUTPUT_DIR=$(dirname "${OUTPUT_FILE}")
+        else
+            TEMP_OUTPUT_DIR=$OUTPUT_DIR
+        fi
 		OUTPUT_FILE="${OUTPUT_FILE%.*}"
 		OUTPUT_FILE=${OUTPUT_FILE##*/}
-		OUTPUT_FILES[$i]="$OUTPUT_DIR/$OUTPUT_FILE"
+		OUTPUT_FILES[$i]="$TEMP_OUTPUT_DIR/$OUTPUT_FILE"
 	fi
 done
 
@@ -112,6 +118,7 @@ command -v git >/dev/null 2>&1 || { echo >&2 "Error: git command not found in PA
 
 
 git show >/dev/null 2>&1 || { echo >&2 "Error: no git repository found in path. Aborting."; exit 1; }
+
 
 LAST_TAG=$(git describe --abbrev=0 --tags)
 MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
