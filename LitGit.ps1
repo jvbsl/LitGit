@@ -9,7 +9,6 @@
 $TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 
 $TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY"
-$OUTPUT_DIR="$TOOL_DIRECTORY"
 $CONFIG_FILE="$TOOL_DIRECTORY/LitGit.config"
 
 
@@ -99,10 +98,17 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 	if ($OUTPUT_FILES.Length -le $i)
 	{
 		if (-Not (Test-Path $TEMPLATE_FILES[$i])) {Write-Error "Error: Template file '${$TEMPLATE_FILES[$i]}' not found! Aborting." ; exit 1;}
-		$OUTPUT_FILE=$TEMPLATE_FILES[$i]
+
+        $OUTPUT_FILE=$TEMPLATE_FILES[$i]
+        if (!$OUTPUT_DIR)
+        {
+            $TEMP_OUTPUT_DIR=[System.IO.Path]::GetDirectoryName($OUTPUT_FILE)
+        } else {
+            $TEMP_OUTPUT_DIR=$OUTPUT_DIR
+        }
 		$OUTPUT_FILE=[System.IO.Path]::GetFileNameWithoutExtension($OUTPUT_FILE)
 
-		$OUTPUT_FILES+= "$OUTPUT_DIR/$OUTPUT_FILE"
+		$OUTPUT_FILES+= "$TEMP_OUTPUT_DIR/$OUTPUT_FILE"
 	}
 }
 
@@ -205,9 +211,12 @@ foreach ($string in $External_Variables)
 	}
 }
 
-for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
-{
+
+
+
+for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
 	$INPUT_FILE=$TEMPLATE_FILES[$i]
+    if (-Not (Test-Path "$CONFIG_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
 
 	echo "Create templated file $OUTPUT_FILE..."
