@@ -1,1 +1,3 @@
 LitGit.nuspec
+output/*
+tools/*

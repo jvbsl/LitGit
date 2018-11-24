@@ -1,12 +1,16 @@
 ./LitGit.ps1
 
+$TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 
-$TOOLS_DIR=./tools
+$MONO="mono"
 
-$NUGET=$TOOLS_DIR/nuget.exe
+$TOOLS_DIR="$TOOL_DIRECTORY/tools"
+
+$NUGET="$TOOLS_DIR/nuget.exe"
 
 New-Item -ItemType Directory -Force -Path $TOOLS_DIR
 
-wget "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -outfile $NUGET
+(new-object System.Net.WebClient).DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", $NUGET)
 
-$NUGET pack LitGit.nuspec -OutputDirectory output
+
+&$MONO $NUGET pack LitGit.nuspec -OutputDirectory output
