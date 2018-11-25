@@ -14,6 +14,7 @@ Options:
 							   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension
 							   and the output directory is the specified or default (-d | --destination-dir).
 	-o, --outputs	<outputfile1>   <outputfile2>	The output files generated from the corresponding template files. see (-t | --templates).
+	-m, --machine-output				Generate machine friendlier output.
  ``` 
  
  LitGit.config files example:

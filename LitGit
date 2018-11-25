@@ -15,6 +15,7 @@ TEMPLATE_FILES=()
 OUTPUT_FILES=()
 PARSING_TEMPLATE_FILES=false
 PARSING_OUTPUT_FILES=false
+USE_MACHINE_OUTPUT=false
 
 for i in "$@"
 do
@@ -33,6 +34,7 @@ case $i in
     echo -e "\t\t\t\t\t\t\t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
     echo -e "\t\t\t\t\t\t\t   and the output directory is the specified or default (-d | --destination-dir)."
     echo -e "\t-o, --outputs\t<outputfile1>   <outputfile2>\tThe output files generated from the corresponding template files. see (-t | --templates)."
+    echo -e "\t-m, --machine-output\t\t\t\tGenerate machine friendlier output."   
     exit 0
     ;;
     -c|--config)
@@ -68,6 +70,10 @@ case $i in
 	PARSING_TEMPLATE_FILES=false
 	PARSING_OUTPUT_FILES=true
 	shift
+    ;;
+    -m|--machine-output)
+    USE_MACHINE_OUTPUT=true
+    shift
     ;;
     *)
     	if [ "$PARSING_TEMPLATE_FILES" = true ];
@@ -122,7 +128,11 @@ git show >/dev/null 2>&1 || { echo >&2 "Error: no git repository found in path. 
 
 LAST_TAG=$(git describe --abbrev=0 --tags)
 MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
-echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+if [ "$USE_MACHINE_OUTPUT" = "true" ]; then
+    echo "$LAST_TAG $MATCHING_COMMIT"
+else
+    echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+fi
 
 # git cat-file -p $MATCHING_COMMIT
 
@@ -173,7 +183,7 @@ fi
 
 YEAR=$(date +"%Y")
 # SET DEFAULT VALUES
-PRODUCT=$(basename -s .git `git config --get remote.origin.url`) # 
+PRODUCT=$(basename -s .git `git config --get remote.origin.url` 2> /dev/null) # 
 #AUTHORS=$(git log --all --format='%aN %cE' | sort -u)
 AUTHORS=$(git --no-pager show -s --format='%an' $INITIAL_COMMIT) # Author of initiial commit
 COMPANY="$AUTHORS"
@@ -229,6 +239,11 @@ for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
 	[ -f "$INPUT_FILE" ] || continue
 	OUTPUT_FILE=${OUTPUT_FILES[$i]}
 
-	echo "Create templated file $OUTPUT_FILE..."
+    if [ "$USE_MACHINE_OUTPUT" = "true" ];
+    then
+        echo "$OUTPUT_FILE"
+    else
+	    echo "Create templated file $OUTPUT_FILE..."
+    fi
 	expandVarsStrict < "$INPUT_FILE" >"$OUTPUT_FILE"
 done

@@ -18,7 +18,26 @@
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
     <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent">
-        <Exec Command="$(LitGit) -t %(LitGitTemplates.FullPath)" />
-    </Target>
+        <Exec Command="$(LitGit) -m -t %(LitGitTemplates.FullPath)" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" ItemName="OutputOfExec" />
+        </Exec>
+        <ItemGroup>
+            <LitGitFiles Include="$([MSBuild]::MakeRelative($(ProjectDir), %(OutputOfExec.Identity)))" Condition="Exists('%(OutputOfExec.Identity)')" />
+        </ItemGroup>
 
+        <ItemGroup>
+            <LitGitFilesCompilable Include="@(LitGitFiles)" Condition="('%(Extension)' == '.cs') Or ('%(Extension)' == '.vb') Or ('%(Extension)' == '.fs')" />
+            <LitGitFilesNone Include="@(LitGitFiles)" Condition="!(('%(Extension)' == '.cs') Or ('%(Extension)' == '.vb') Or ('%(Extension)' == '.fs'))" />
+        </ItemGroup>
+        <ItemGroup>
+            <Compile Update="%(LitGitFilesCompilable.Identity)">
+                <DependentUpon>%(LitGitFilesCompilable.Identity).template</DependentUpon>
+            </Compile>
+            <None Update="%(LitGitFilesNone.Identity)">
+                <DependentUpon>%(LitGitFilesNone.Identity).template</DependentUpon>
+            </None>
+        </ItemGroup>
+        <!--<Warning Text="Compiling: %(LitGitFilesCompilable.Identity)" />
+        <Warning Text="None: %(LitGitFilesNone.Identity)" />-->
+    </Target>
 </Project>

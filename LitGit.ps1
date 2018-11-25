@@ -11,12 +11,12 @@ $TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 $TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY"
 $CONFIG_FILE="$TOOL_DIRECTORY/LitGit.config"
 
-
-
 $TEMPLATE_FILES=@()
 $OUTPUT_FILES=@()
-$PARSING_TEMPLATE_FILES=false
-$PARSING_OUTPUT_FILES=false
+$PARSING_TEMPLATE_FILES=$FALSE
+$PARSING_OUTPUT_FILES=$FALSE
+$USE_MACHINE_OUTPUT=$FALSE
+
 for ($i=0; $i -lt $args.Length; $i++)
 {
 	$key=$args[$i]
@@ -34,39 +34,47 @@ for ($i=0; $i -lt $args.Length; $i++)
         echo "`t`t`t`t`t`t`t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
         echo "`t`t`t`t`t`t`t   and the output directory is the specified or default (-d | --destination-dir)."
         echo "`t-o, --outputs`t<outputfile1>   <outputfile2>`tThe output files generated from the corresponding template files. see (-t | --templates)."
+        echo "`t-m, --machine-output`t`t`t`tGenerate machine friendlier output."        
         exit 0
     }
 	elseif ($key -eq "-c" -Or $key -eq "--config")
 	{
-		$PARSING_TEMPLATE_FILES=false
-		$PARSING_OUTPUT_FILES=false
+		$PARSING_TEMPLATE_FILES=$FALSE
+		$PARSING_OUTPUT_FILES=$FALSE
 		$CONFIG_FILE=$args[++$i]
 		if (-Not (Test-Path "$CONFIG_FILE")) {Write-Error "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1;}
 	}
-	elseif ($key -eq "-s" -Or $key -eq "--searchpath")
+	
+    
+    elseif ($key -eq "-s" -Or $key -eq "--searchpath")
 	{
-		$PARSING_TEMPLATE_FILES=false
-		$PARSING_OUTPUT_FILES=false
+		$PARSING_TEMPLATE_FILES=$FALSE
+		$PARSING_OUTPUT_FILES=$FALSE
 		$TEMPLATE_SEARCH_DIR=$args[++$i]
 		if (-Not (Test-Path "$TEMPLATE_SEARCH_DIR")) {Write-Error "Error: Template search directory '$TEMPLATE_SEARCH_DIR' not found! Aborting." ; exit 1;}
 	}
-	elseif ($key -eq "-d" -Or $key -eq "--destination-dir")
+	
+    elseif ($key -eq "-d" -Or $key -eq "--destination-dir")
 	{
-		$PARSING_TEMPLATE_FILES=false
-		$PARSING_OUTPUT_FILES=false
+		$PARSING_TEMPLATE_FILES=$FALSE
+		$PARSING_OUTPUT_FILES=$FALSE
 		$TEMPLATE_SEARCH_DIR=$args[++$i]
 		New-Item "$OUTPUT_DIR" -ItemType Directory -ea stop
 		# mkdir -p "$OUTPUT_DIR" || { Write-Error "Error: Could not create output directory '$OUTPUT_DIR'. Aborting."; exit 1; }
 	}
 	elseif ($key -eq "-t" -Or $key -eq "--templates")
 	{
-		$PARSING_TEMPLATE_FILES=true
-		$PARSING_OUTPUT_FILES=false
+		$PARSING_TEMPLATE_FILES=$TRUE
+		$PARSING_OUTPUT_FILES=$FALSE
 	}
 	elseif ($key -eq "-o" -Or $key -eq "--outputs")
 	{
-		$PARSING_TEMPLATE_FILES=false
-		$PARSING_OUTPUT_FILES=true
+		$PARSING_TEMPLATE_FILES=$FALSE
+		$PARSING_OUTPUT_FILES=$TRUE
+	}
+	elseif ($key -eq "-m" -Or $key -eq "--machine-output")
+	{
+		$USE_MACHINE_OUTPUT=$TRUE
 	}
 	else
 	{
@@ -122,7 +130,11 @@ if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
 $MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
-echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+if ($USE_MACHINE_OUTPUT) {
+    echo "$LAST_TAG $MATCHING_COMMIT"
+} else {
+    echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+}
 
 # git cat-file -p $MATCHING_COMMIT
 
@@ -228,7 +240,10 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
 	$INPUT_FILE=$TEMPLATE_FILES[$i]
     if (-Not (Test-Path "$CONFIG_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
-
-	echo "Create templated file $OUTPUT_FILE..."
+    if ($USE_MACHINE_OUTPUT) {
+	    echo "$OUTPUT_FILE"
+    } else {
+        echo "Create templated file $OUTPUT_FILE..."
+    }
 	expandVarsStrict "$INPUT_FILE" "$OUTPUT_FILE"
 }
