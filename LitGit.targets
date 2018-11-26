@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
-        <ScriptExe Condition="'$(OS)' == 'Windows_NT'" >powershell</ScriptExe>
+        <ScriptExe Condition="'$(OS)' == 'Windows_NT'" >@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command</ScriptExe>
         <ScriptExe Condition="'$(OS)' != 'Windows_NT'" ></ScriptExe>
 
         <ScriptFileEnding Condition="'$(OS)' == 'Windows_NT'" >.ps1</ScriptFileEnding>
         <ScriptFileEnding Condition="'$(OS)' != 'Windows_NT'" ></ScriptFileEnding>
 
-        <LitGit>$(ScriptExe) $(MSBuildThisFileDirectory)../tools/LitGit$(ScriptFileEnding)</LitGit>
+        <LitGit>&amp; '$(MSBuildThisFileDirectory)../tools/LitGit$(ScriptFileEnding)'</LitGit>
     </PropertyGroup>
     <ItemGroup>
         <AvailableItemName Include="LitGitTemplateReference" />
@@ -18,7 +18,7 @@
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
     <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent">
-        <Exec Command="$(LitGit) -m -t %(LitGitTemplates.FullPath)" ConsoleToMSBuild="true">
+        <Exec Command="$(ScriptExe) &quot;$(LitGit) -m -t '%(LitGitTemplates.FullPath)'&quot;" ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" ItemName="OutputOfExec" />
         </Exec>
         <ItemGroup>
