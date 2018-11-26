@@ -17,6 +17,7 @@
         <file src=".\LitGit.ps1" target="tools\" />
         <file src="./LitGit.ps1" target="tools/" />
         <!-- Targets -->
+        <file src="LitGit.props" target="build" />
         <file src="LitGit.targets" target="build" />
     </files>
 </package>

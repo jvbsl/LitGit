@@ -186,7 +186,7 @@ else
 $YEAR=(Get-Date).year
 # SET DEFAULT VALUES
 $PRODUCT=[System.IO.Path]::GetFileNameWithoutExtension($REMOTE_URL)
-# AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique –AsString)
+# AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique â€“AsString)
 $AUTHORS=(git --no-pager show -s --format='%an' "$INITIAL_COMMIT") # Author of initiial commit
 $COMPANY="$AUTHORS"
 $PROJECT_URL="$REMOTE_URL"
@@ -208,7 +208,7 @@ function expandVarsStrict
 }
 
 
-$External_Variables = Get-Content -Path "$CONFIG_FILE"
+$External_Variables = Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue
 foreach ($string in $External_Variables)
 {
 	if ("$string" -Match "=")
@@ -226,7 +226,7 @@ foreach ($string in $External_Variables)
 
 if ("$VERSION_REVISION".Length -eq 0)
 {
-    $VERSION_REVISION=(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object –Line).Lines
+    $VERSION_REVISION=(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object -Line).Lines
 }
 
 $VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"
