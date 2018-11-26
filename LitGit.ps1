@@ -125,7 +125,7 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 if ((Get-Command "git" -ErrorAction SilentlyContinue) -eq $null) { Write-Error "Error: git command not found in PATH. Aborting."; exit 1; }
 
 
-git show 2>&1 | out-null
+git rev-parse --git-dir 2>&1 | out-null
 if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in path. Aborting."; exit 1; }
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
