@@ -238,7 +238,7 @@ $INFORMATIONAL_VERSION="$VERSION_FULL+${CURRENT_BRANCH}:$MATCHING_COMMIT"
 
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
 	$INPUT_FILE=$TEMPLATE_FILES[$i]
-    if (-Not (Test-Path "$CONFIG_FILE")) { continue }
+    if (-Not (Test-Path "$INPUT_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
     if ($USE_MACHINE_OUTPUT) {
 	    echo "$OUTPUT_FILE"
