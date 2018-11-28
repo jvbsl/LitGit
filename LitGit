@@ -187,7 +187,7 @@ PRODUCT=$(basename -s .git `git config --get remote.origin.url` 2> /dev/null) #
 #AUTHORS=$(git log --all --format='%aN %cE' | sort -u)
 AUTHORS=$(git --no-pager show -s --format='%an' $INITIAL_COMMIT) # Author of initiial commit
 COMPANY="$AUTHORS"
-PROJECT_URL="$REMOTE_URL"
+PROJECT_URL="$REMOTE_URL_HTTPS"
 COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
 DESCRIPTION=""
 

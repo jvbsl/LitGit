@@ -189,7 +189,7 @@ $PRODUCT=[System.IO.Path]::GetFileNameWithoutExtension($REMOTE_URL)
 # AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique â€“AsString)
 $AUTHORS=(git --no-pager show -s --format='%an' "$INITIAL_COMMIT") # Author of initiial commit
 $COMPANY="$AUTHORS"
-$PROJECT_URL="$REMOTE_URL"
+$PROJECT_URL="$REMOTE_URL_HTTPS"
 $COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
 $DESCRIPTION=""
 
