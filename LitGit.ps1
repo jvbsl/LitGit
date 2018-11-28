@@ -125,7 +125,7 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 if ((Get-Command "git" -ErrorAction SilentlyContinue) -eq $null) { Write-Error "Error: git command not found in PATH. Aborting."; exit 1; }
 
 
-git show 2>&1 | out-null
+git rev-parse --git-dir 2>&1 | out-null
 if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in path. Aborting."; exit 1; }
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
@@ -186,10 +186,10 @@ else
 $YEAR=(Get-Date).year
 # SET DEFAULT VALUES
 $PRODUCT=[System.IO.Path]::GetFileNameWithoutExtension($REMOTE_URL)
-# AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique –AsString)
+# AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique â€“AsString)
 $AUTHORS=(git --no-pager show -s --format='%an' "$INITIAL_COMMIT") # Author of initiial commit
 $COMPANY="$AUTHORS"
-$PROJECT_URL="$REMOTE_URL"
+$PROJECT_URL="$REMOTE_URL_HTTPS"
 $COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
 $DESCRIPTION=""
 
@@ -208,7 +208,7 @@ function expandVarsStrict
 }
 
 
-$External_Variables = Get-Content -Path "$CONFIG_FILE"
+$External_Variables = Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue
 foreach ($string in $External_Variables)
 {
 	if ("$string" -Match "=")
@@ -226,7 +226,7 @@ foreach ($string in $External_Variables)
 
 if ("$VERSION_REVISION".Length -eq 0)
 {
-    $VERSION_REVISION=(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object –Line).Lines
+    $VERSION_REVISION=(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object -Line).Lines
 }
 
 $VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"
@@ -238,7 +238,7 @@ $INFORMATIONAL_VERSION="$VERSION_FULL+${CURRENT_BRANCH}:$MATCHING_COMMIT"
 
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
 	$INPUT_FILE=$TEMPLATE_FILES[$i]
-    if (-Not (Test-Path "$CONFIG_FILE")) { continue }
+    if (-Not (Test-Path "$INPUT_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
     if ($USE_MACHINE_OUTPUT) {
 	    echo "$OUTPUT_FILE"

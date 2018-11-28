@@ -123,7 +123,7 @@ done
 command -v git >/dev/null 2>&1 || { echo >&2 "Error: git command not found in PATH. Aborting."; exit 1; }
 
 
-git show >/dev/null 2>&1 || { echo >&2 "Error: no git repository found in path. Aborting."; exit 1; }
+git rev-parse --git-dir >/dev/null 2>&1 || { echo >&2 "Error: no git repository found in path. Aborting."; exit 1; }
 
 
 LAST_TAG=$(git describe --abbrev=0 --tags)
@@ -187,7 +187,7 @@ PRODUCT=$(basename -s .git `git config --get remote.origin.url` 2> /dev/null) #
 #AUTHORS=$(git log --all --format='%aN %cE' | sort -u)
 AUTHORS=$(git --no-pager show -s --format='%an' $INITIAL_COMMIT) # Author of initiial commit
 COMPANY="$AUTHORS"
-PROJECT_URL="$REMOTE_URL"
+PROJECT_URL="$REMOTE_URL_HTTPS"
 COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
 DESCRIPTION=""
 
