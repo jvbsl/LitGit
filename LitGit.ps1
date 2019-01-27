@@ -185,8 +185,8 @@ else
 
 $YEAR=(Get-Date).year
 # SET DEFAULT VALUES
-$PRODUCT=[System.IO.Path]::GetFileNameWithoutExtension($REMOTE_URL)
-# AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique â€“AsString)
+$PRODUCT=if([System.IO.Path]::GetExtension($REMOTE_URL) -Match ".git" ) {[System.IO.Path]::GetFileNameWithoutExtension($REMOTE_URL)} else {[System.IO.Path]::GetFileName($REMOTE_URL)}
+# AUTHORS=(git log --all --format='%aN %cE' | sort-object | Get-Unique â€“AsString)WW
 $AUTHORS=(git --no-pager show -s --format='%an' "$INITIAL_COMMIT") # Author of initiial commit
 $COMPANY="$AUTHORS"
 $PROJECT_URL="$REMOTE_URL_HTTPS"
