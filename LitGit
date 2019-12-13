@@ -137,6 +137,9 @@ fi
 # git cat-file -p $MATCHING_COMMIT
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$CURRENT_BRANCH"="HEAD" ]; then
+    CURRENT_BRANCH=$(git branch --remote --verbose --no-abbrev --contains | sed -rne 's/^[^\/]*\/([^\ ]+).*$/\1/p')
+fi
 
 if [[ $LAST_TAG =~ "-"  ]];
 then
@@ -158,6 +161,10 @@ else
 		VERSION_ADDITIONAL="-alpha"
 	fi
 	BASE_VERSION=$LAST_TAG
+fi
+
+if [ ! "$USE_MACHINE_OUTPUT" = "true" ]; then
+    echo "Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
 fi
 
 TEMP_VERSION=( ${BASE_VERSION//./ } )
