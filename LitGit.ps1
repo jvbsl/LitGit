@@ -139,6 +139,11 @@ if ($USE_MACHINE_OUTPUT) {
 # git cat-file -p $MATCHING_COMMIT
 
 $CURRENT_BRANCH=(git rev-parse --abbrev-ref HEAD)
+if ($CURRENT_BRANCH -eq "HEAD")
+{
+    (git branch --remote --verbose --no-abbrev --contains) -match "^[^\/]*\/([^ ]+).*"
+    $CURRENT_BRANCH=$Matches[1]
+}
 
 if ($LAST_TAG -Match "-")
 {
