@@ -16,7 +16,7 @@
     <ItemGroup>
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
-    <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent">
+    <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent" Inputs="@(LitGitTemplates)" Outputs="@(LitGitTemplates->'%(rootdir)%(directory)%(filename)')">
         <Exec Command="$(ScriptExe) $(ScriptPrefix)$(LitGit) -m -t '%(LitGitTemplates.FullPath)'$(ScriptPostfix)" ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" ItemName="OutputOfExec" />
         </Exec>
@@ -35,6 +35,8 @@
             <None Update="%(LitGitFilesNone.Identity)">
                 <DependentUpon>%(LitGitFilesNone.Identity).template</DependentUpon>
             </None>
+            <FileWrites Include="@(LitGitFilesNone.Identity)" />
+            <FileWrites Include="%(LitGitFilesCompilable.Identity)" />
         </ItemGroup>
         <!--<Warning Text="Compiling: %(LitGitFilesCompilable.Identity)" />
         <Warning Text="None: %(LitGitFilesNone.Identity)" />-->
