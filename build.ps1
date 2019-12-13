@@ -2,8 +2,10 @@
 
 $TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 
-$MONO="mono"
-
+if(!$IsWindows)
+{
+    $MONO="mono"
+}
 $TOOLS_DIR="$TOOL_DIRECTORY/tools"
 
 $NUGET="$TOOLS_DIR/nuget.exe"
