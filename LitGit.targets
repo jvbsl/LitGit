@@ -3,7 +3,7 @@
 
     <PropertyGroup>
         <ScriptExe Condition="'$(OS)' == 'Windows_NT'" >@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass</ScriptExe>
-        <ScriptExe Condition="'$(OS)' != 'Windows_NT'" ></ScriptExe>
+        <ScriptExe Condition="'$(OS)' != 'Windows_NT'" >bash</ScriptExe>
         <ScriptPrefix Condition="'$(OS)' == 'Windows_NT'" >&quot;&amp;</ScriptPrefix>
         <ScriptPostfix  Condition="'$(OS)' == 'Windows_NT'" >&quot;</ScriptPostfix>
 
