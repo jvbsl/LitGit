@@ -28,6 +28,6 @@ jobs:
     - name: Run tests
       run: echo "No tests yet!"
     - name: Deploy Nuget Package
-      run: nuget push ./output/*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+      run: ./tools/nuget push ./output/*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
       shell: bash
       if: matrix.os == 'windows-latest'
