@@ -201,6 +201,8 @@ function expandVarsStrict
 )
 {
 	$inputContent = [IO.File]::ReadAllText($inputFile)
+	
+	$inputContent = $inputContent.Replace('\\', '\') -replace '\$(?!{)','`$'
 
 	$expandedContent = $ExecutionContext.InvokeCommand.ExpandString($inputContent)
 
