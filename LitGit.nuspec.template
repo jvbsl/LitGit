@@ -8,6 +8,7 @@
         <projectUrl>${PROJECT_URL}</projectUrl>
         <requireLicenseAcceptance>${NUGET_REQUIRESLICENSEACCEPTANCE}</requireLicenseAcceptance>
         <description>${DESCRIPTION}</description>
+        <developmentDependency>true</developmentDependency>
     </metadata>
 
     <files>
