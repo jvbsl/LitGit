@@ -3,5 +3,7 @@
     <ItemGroup>
         <ProjectCapability Include="ShowMissingItemTypes" />
         <AvailableItemName Include="LitGitTemplateReference" />
+		<PropertyPageSchema Include="$(MSBuildThisFileDirectory)LitGitSchema.xml" />
+		<ProjectCapability Include="DynamicDependentFile" />
     </ItemGroup>
 </Project>
