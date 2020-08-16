@@ -16,7 +16,7 @@ $OUTPUT_FILES=@()
 $PARSING_TEMPLATE_FILES=$FALSE
 $PARSING_OUTPUT_FILES=$FALSE
 $USE_MACHINE_OUTPUT=$FALSE
-
+$VERBOSE_OUTPUT=$FALSE
 for ($i=0; $i -lt $args.Length; $i++)
 {
 	$key=$args[$i]
@@ -34,7 +34,8 @@ for ($i=0; $i -lt $args.Length; $i++)
         echo "`t`t`t`t`t`t`t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
         echo "`t`t`t`t`t`t`t   and the output directory is the specified or default (-d | --destination-dir)."
         echo "`t-o, --outputs`t<outputfile1>   <outputfile2>`tThe output files generated from the corresponding template files. see (-t | --templates)."
-        echo "`t-m, --machine-output`t`t`t`tGenerate machine friendlier output."        
+        echo "`t-m, --machine-output`t`t`t`tGenerate machine friendlier output."
+        echo "`t-v, --verbose`t`t`t`tGenerate verbose output."   
         exit 0
     }
 	elseif ($key -eq "-c" -Or $key -eq "--config")
@@ -75,6 +76,10 @@ for ($i=0; $i -lt $args.Length; $i++)
 	elseif ($key -eq "-m" -Or $key -eq "--machine-output")
 	{
 		$USE_MACHINE_OUTPUT=$TRUE
+	}
+	elseif ($key -eq "-v" -Or $key -eq "--verbose")
+	{
+		$VERBOSE_OUTPUT=$TRUE
 	}
 	else
 	{
@@ -120,8 +125,6 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 	}
 }
 
-
-
 if ((Get-Command "git" -ErrorAction SilentlyContinue) -eq $null) { Write-Error "Error: git command not found in PATH. Aborting."; exit 1; }
 
 
@@ -129,6 +132,9 @@ git rev-parse --git-dir 2>&1 | out-null
 if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in path. Aborting."; exit 1; }
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
+
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Verbose output activated" }
+
 $MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
 if ($USE_MACHINE_OUTPUT) {
     echo "$LAST_TAG $MATCHING_COMMIT"
@@ -144,6 +150,7 @@ if ($CURRENT_BRANCH -eq "HEAD")
     (git branch --remote --verbose --no-abbrev --contains) -match "^[^\/]*\/([^ ]+).*"
     $CURRENT_BRANCH=$Matches[1]
 }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Current branch: $CURRENT_BRANCH" }
 
 if ($LAST_TAG -Match "-")
 {
@@ -166,8 +173,11 @@ else
 	}
 	$BASE_VERSION=$LAST_TAG
 }
+
 if (!$USE_MACHINE_OUTPUT){
     echo "Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
+} else {
+    if ($VERBOSE_OUTPUT) {  echo "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL" }
 }
 $TEMP_VERSION=$BASE_VERSION.Split(".", 4 , [StringSplitOptions]"None")
 $VERSION_MAJOR=$TEMP_VERSION[0]
@@ -178,6 +188,9 @@ $VERSION_REVISION=$TEMP_VERSION[3]
 $INITIAL_COMMIT=(git rev-list --max-parents=0 HEAD)
 
 $REMOTE_URL=((git remote get-url --all origin 2> $null) | select -first 1)
+
+
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Initial Commit: $INITIAL_COMMIT" }
 
 if ($REMOTE_URL -Match "@")
 {
@@ -190,6 +203,8 @@ else
 	$REMOTE_URL_HTTPS=$REMOTE_URL
 }
 
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Remote url: $REMOTE_URL_HTTPS" }
+
 $YEAR=(Get-Date).year
 # SET DEFAULT VALUES
 $PRODUCT=if([System.IO.Path]::GetExtension($REMOTE_URL) -Match ".git" ) {[System.IO.Path]::GetFileNameWithoutExtension($REMOTE_URL)} else {[System.IO.Path]::GetFileName($REMOTE_URL)}
@@ -199,6 +214,15 @@ $COMPANY="$AUTHORS"
 $PROJECT_URL="$REMOTE_URL_HTTPS"
 $COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
 $DESCRIPTION=""
+
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Before Additional parsing" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Year: $YEAR" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Product: $PRODUCT" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Authors: $AUTHORS" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Company: $COMPANY" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Project url: $PROJECT_URL" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Copyright: $COPYRIGHT" }
+if ($VERBOSE_OUTPUT) {  echo "" }
 
 
 function expandVarsStrict
@@ -231,8 +255,6 @@ foreach ($string in $External_Variables)
 }
 
 
-
-
 if ("$VERSION_REVISION".Length -eq 0)
 {
     $VERSION_REVISION=(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object -Line).Lines
@@ -244,6 +266,15 @@ $VERSION_LONG="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_BUILD.$VERSION_REVISION"
 $VERSION_FULL="$VERSION_LONG$VERSION_ADDITIONAL"
 
 $INFORMATIONAL_VERSION="$VERSION_FULL+${CURRENT_BRANCH}:$MATCHING_COMMIT"
+
+if ($VERBOSE_OUTPUT) {  echo "[INFO] After Additional parsing" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Year: $YEAR" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Product: $PRODUCT" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Authors: $AUTHORS" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Company: $COMPANY" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Project url: $PROJECT_URL" }
+if ($VERBOSE_OUTPUT) {  echo "[INFO] Copyright: $COPYRIGHT" }
+if ($VERBOSE_OUTPUT) {  echo "" }
 
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
 	$INPUT_FILE=$TEMPLATE_FILES[$i]

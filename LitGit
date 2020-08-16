@@ -34,7 +34,7 @@ case $i in
     echo -e "\t\t\t\t\t\t\t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
     echo -e "\t\t\t\t\t\t\t   and the output directory is the specified or default (-d | --destination-dir)."
     echo -e "\t-o, --outputs\t<outputfile1>   <outputfile2>\tThe output files generated from the corresponding template files. see (-t | --templates)."
-    echo -e "\t-m, --machine-output\t\t\t\tGenerate machine friendlier output."   
+    echo -e "\t-m, --machine-output\t\t\t\tGenerate machine friendlier output."
     echo -e "\t-v, --verbose\t\t\t\tGenerate verbose output."   
     exit 0
     ;;
@@ -149,6 +149,7 @@ if [ "$CURRENT_BRANCH" = "HEAD" ]; then
     CURRENT_BRANCH=$(git branch --remote --verbose --no-abbrev --contains | sed -rne 's/^[^\/]*\/([^\ ]+).*$/\1/p')
 fi
 
+
 $VERBOSE_OUTPUT && echo "[INFO] Current branch: $CURRENT_BRANCH"
 
 if [[ $LAST_TAG =~ "-"  ]];
@@ -191,7 +192,6 @@ REMOTE_URL=$(git remote get-url --all origin 2> /dev/null | head -n 1)
 
 $VERBOSE_OUTPUT && echo "[INFO] Initial Commit: $INITIAL_COMMIT"
 
-
 if [[ $REMOTE_URL =~ "@" ]];
 then
 	TEMP=${REMOTE_URL#*@}
@@ -204,7 +204,6 @@ else
 fi
 
 $VERBOSE_OUTPUT && echo "[INFO] Remote url: $REMOTE_URL_HTTPS"
-
 
 YEAR=$(date +"%Y")
 # SET DEFAULT VALUES
