@@ -30,7 +30,8 @@
             <LitGitFilesNone Include="@(LitGitFiles)" Condition="!(('%(Extension)' == '.cs') Or ('%(Extension)' == '.vb') Or ('%(Extension)' == '.fs'))" />
         </ItemGroup>
         <ItemGroup>
-            <Compile Update="%(LitGitFilesCompilable.Identity)">
+            <Compile Remove="%(LitGitFilesCompilable.Identity)" />
+            <Compile Include="%(LitGitFilesCompilable.Identity)">
                 <DependentUpon>%(LitGitFilesCompilable.Identity).template</DependentUpon>
             </Compile>
             <None Update="%(LitGitFilesNone.Identity)">
