@@ -1,4 +1,4 @@
-./LitGit.ps1
+./LitGit.ps1 -v
 
 $TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 

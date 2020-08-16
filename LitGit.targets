@@ -17,7 +17,7 @@
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
     <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent" Inputs="@(LitGitTemplates)" Outputs="@(LitGitTemplates->'%(rootdir)%(directory)%(filename)')">
-        <Exec Command="$(ScriptExe) $(ScriptPrefix)$(LitGit) -m -t '%(LitGitTemplates.FullPath)'$(ScriptPostfix)" ConsoleToMSBuild="true">
+        <Exec Command="$(ScriptExe) $(ScriptPrefix)$(LitGit) -v -m -t '%(LitGitTemplates.FullPath)'$(ScriptPostfix)" ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" ItemName="OutputOfExec" />
         </Exec>
         <ItemGroup>

@@ -1,0 +1,7 @@
+<ProjectSchemaDefinitions xmlns="http://schemas.microsoft.com/build/2009/properties">
+	<ContentType Name="LitGitTemplate" DisplayName="LitGitTemplate" ItemType="Page">
+		<NameValuePair Name="DependentExtensions" Value=".template" />
+	</ContentType>
+	<FileExtension Name="*" ContentType="LitGitTemplate" />
+
+</ProjectSchemaDefinitions>
