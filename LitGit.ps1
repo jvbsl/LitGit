@@ -22,20 +22,20 @@ for ($i=0; $i -lt $args.Length; $i++)
 	$key=$args[$i]
     if ($key -eq "-h" -Or $key -eq "--help")
     {
-        echo "Usage: LitGit [options]"
-        echo "Extracts meta information from git. Like version information from tag and commit. Authors and many more."
-        echo "see https://github.com/jvbsl/LitGit"
-        echo ""
-        echo "Options:"
-        echo "`t-c, --config <config file>`t`t`tPath to a LitGit configuration file: see https://github.com/jvbsl/LitGit"
-        echo "`t-s, --searchpath <path>`t`t`t`tPath to a directory in which to search for *.template files. Default is directory of script."
-        echo "`t-d, --destination-dir <path>`t`t`tThe output directory to which the templated files are written, if not specified otherwise by (-o | --outputs)."
-        echo "`t-t, --templates`t<templatefile1> <templatefile2>`tSpecific *.template files to process corresponding to a specific outputfile declaration."
-        echo "`t`t`t`t`t`t`t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
-        echo "`t`t`t`t`t`t`t   and the output directory is the specified or default (-d | --destination-dir)."
-        echo "`t-o, --outputs`t<outputfile1>   <outputfile2>`tThe output files generated from the corresponding template files. see (-t | --templates)."
-        echo "`t-m, --machine-output`t`t`t`tGenerate machine friendlier output."
-        echo "`t-v, --verbose`t`t`t`tGenerate verbose output."   
+        Write-Host "Usage: LitGit [options]"
+        Write-Host "Extracts meta information from git. Like version information from tag and commit. Authors and many more."
+        Write-Host "see https://github.com/jvbsl/LitGit"
+        Write-Host ""
+        Write-Host "Options:"
+        Write-Host "`t-c, --config <config file>`t`t`tPath to a LitGit configuration file: see https://github.com/jvbsl/LitGit"
+        Write-Host "`t-s, --searchpath <path>`t`t`t`tPath to a directory in which to search for *.template files. Default is directory of script."
+        Write-Host "`t-d, --destination-dir <path>`t`t`tThe output directory to which the templated files are written, if not specified otherwise by (-o | --outputs)."
+        Write-Host "`t-t, --templates`t<templatefile1> <templatefile2>`tSpecific *.template files to process corresponding to a specific outputfile declaration."
+        Write-Host "`t`t`t`t`t`t`t   If no corresponding outputfile is specified the output name is derived from template file name without '.template' extension"
+        Write-Host "`t`t`t`t`t`t`t   and the output directory is the specified or default (-d | --destination-dir)."
+        Write-Host "`t-o, --outputs`t<outputfile1>   <outputfile2>`tThe output files generated from the corresponding template files. see (-t | --templates)."
+        Write-Host "`t-m, --machine-output`t`t`t`tGenerate machine friendlier output."
+        Write-Host "`t-v, --verbose`t`t`t`tGenerate verbose output."   
         exit 0
     }
 	elseif ($key -eq "-c" -Or $key -eq "--config")
@@ -125,7 +125,7 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 	}
 }
 
-if ((Get-Command "git" -ErrorAction SilentlyContinue) -eq $null) { Write-Error "Error: git command not found in PATH. Aborting."; exit 1; }
+if ($null -eq (Get-Command "git" -ErrorAction SilentlyContinue)  ) { Write-Error "Error: git command not found in PATH. Aborting."; exit 1; }
 
 
 git rev-parse --git-dir 2>&1 | out-null
@@ -133,13 +133,13 @@ if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
 
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Verbose output activated" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Verbose output activated" }
 
 $MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
 if ($USE_MACHINE_OUTPUT) {
-    echo "$LAST_TAG $MATCHING_COMMIT"
+    Write-Host "$LAST_TAG $MATCHING_COMMIT"
 } else {
-    echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+    Write-Host "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 }
 
 # git cat-file -p $MATCHING_COMMIT
@@ -150,7 +150,7 @@ if ($CURRENT_BRANCH -eq "HEAD")
     (git branch --remote --verbose --no-abbrev --contains) -match "^[^\/]*\/([^ ]+).*"
     $CURRENT_BRANCH=$Matches[1]
 }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Current branch: $CURRENT_BRANCH" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Current branch: $CURRENT_BRANCH" }
 
 if ($LAST_TAG -Match "-")
 {
@@ -175,9 +175,9 @@ else
 }
 
 if (!$USE_MACHINE_OUTPUT){
-    echo "Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
+    Write-Host "Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
 } else {
-    if ($VERBOSE_OUTPUT) {  echo "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL" }
+    if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL" }
 }
 $TEMP_VERSION=$BASE_VERSION.Split(".", 4 , [StringSplitOptions]"None")
 $VERSION_MAJOR=$TEMP_VERSION[0]
@@ -187,10 +187,10 @@ $VERSION_REVISION=$TEMP_VERSION[3]
 
 $INITIAL_COMMIT=(git rev-list --max-parents=0 HEAD)
 
-$REMOTE_URL=((git remote get-url --all origin 2> $null) | select -first 1)
+$REMOTE_URL=((git remote get-url --all origin 2> $null) | Select-Object -first 1)
 
 
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Initial Commit: $INITIAL_COMMIT" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Initial Commit: $INITIAL_COMMIT" }
 
 if ($REMOTE_URL -Match "@")
 {
@@ -203,7 +203,7 @@ else
 	$REMOTE_URL_HTTPS=$REMOTE_URL
 }
 
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Remote url: $REMOTE_URL_HTTPS" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Remote url: $REMOTE_URL_HTTPS" }
 
 $YEAR=(Get-Date).year
 # SET DEFAULT VALUES
@@ -215,14 +215,14 @@ $PROJECT_URL="$REMOTE_URL_HTTPS"
 $COPYRIGHT="Copyright (c) $AUTHORS $YEAR"
 $DESCRIPTION=""
 
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Before Additional parsing" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Year: $YEAR" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Product: $PRODUCT" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Authors: $AUTHORS" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Company: $COMPANY" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Project url: $PROJECT_URL" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Copyright: $COPYRIGHT" }
-if ($VERBOSE_OUTPUT) {  echo "" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Before Additional parsing" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Year: $YEAR" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Product: $PRODUCT" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Authors: $AUTHORS" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Company: $COMPANY" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Project url: $PROJECT_URL" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Copyright: $COPYRIGHT" }
+if ($VERBOSE_OUTPUT) {  Write-Host "" }
 
 
 function expandVarsStrict
@@ -267,23 +267,23 @@ $VERSION_FULL="$VERSION_LONG$VERSION_ADDITIONAL"
 
 $INFORMATIONAL_VERSION="$VERSION_FULL+${CURRENT_BRANCH}:$MATCHING_COMMIT"
 
-if ($VERBOSE_OUTPUT) {  echo "[INFO] After Additional parsing" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Year: $YEAR" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Product: $PRODUCT" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Authors: $AUTHORS" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Company: $COMPANY" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Project url: $PROJECT_URL" }
-if ($VERBOSE_OUTPUT) {  echo "[INFO] Copyright: $COPYRIGHT" }
-if ($VERBOSE_OUTPUT) {  echo "" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] After Additional parsing" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Year: $YEAR" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Product: $PRODUCT" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Authors: $AUTHORS" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Company: $COMPANY" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Project url: $PROJECT_URL" }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Copyright: $COPYRIGHT" }
+if ($VERBOSE_OUTPUT) {  Write-Host "" }
 
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
 	$INPUT_FILE=$TEMPLATE_FILES[$i]
     if (-Not (Test-Path "$INPUT_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
     if ($USE_MACHINE_OUTPUT) {
-	    echo "$OUTPUT_FILE"
+	    Write-Host "$OUTPUT_FILE"
     } else {
-        echo "Create templated file $OUTPUT_FILE..."
+        Write-Host "Create templated file $OUTPUT_FILE..."
     }
 	expandVarsStrict "$INPUT_FILE" "$OUTPUT_FILE"
 }
