@@ -4,7 +4,21 @@ rm -rf ../output/*
 rm -rf packages/*
 
 pushd ..
-./build.sh
+
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Win;;
+    MINGW*)     machine=Win;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+if [ "$machine" == "Win" ]; then
+    pwsh ./build.ps1
+else
+    ./build.sh
+fi
 VERSION=$(ls ./output/* | grep -oP '(?<=LitGit.).*(?=.nupkg)')
 popd
 
