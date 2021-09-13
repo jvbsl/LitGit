@@ -2,6 +2,6 @@ using System;
 public static class VersionInfo
 {
     public const string AssemblyVersion = "${VERSION_LONG}";
-    public const string FileVersion = "${VERSION_FULL}";
-    public const string ProductVersion = "${VERSION_LONG}";
+    public const string FileVersion = "${VERSION_LONG}";
+    public const string ProductVersion = "${INFORMATIONAL_VERSION}";
 }

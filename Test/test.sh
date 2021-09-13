@@ -16,7 +16,7 @@ echo "    <PackageReference Include=\"LitGit\" Version=\"$VERSION\" PrivateAsset
 echo '  </ItemGroup>'>>LitGitPackage.target
 echo '</Project>'>>LitGitPackage.target
 
-rm ProjectSettings.target 2> /dev/null
+rm VersionInfo.cs 2> /dev/null
 
 dotnet clean Test.csproj
 dotnet run Test.csproj # 2&>logfile
