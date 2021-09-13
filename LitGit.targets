@@ -17,16 +17,23 @@
     <ItemGroup>
         <LitGitTemplates Include="@(LitGitTemplateReference)"/>
     </ItemGroup>
-    <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent" Inputs="@(LitGitTemplates)" Outputs="@(LitGitTemplates->'%(rootdir)%(directory)%(filename)')">
+    
+    <!--<PropertyGroup>
+      <CoreCompileDependsOn>BuildLitGitVersions;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+    </PropertyGroup>-->
+    <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent" Inputs="@(LitGitTemplates);FAKE_INPUT" Outputs="@(LitGitTemplates->'%(rootdir)%(directory)%(filename)');FAKE_OUTPUT">
+    
         <Exec Command="$(ScriptExe) $(ScriptPrefix)$(LitGit) $(LitGitVerboseOutputAppendix) -m -t '%(LitGitTemplates.FullPath)'$(ScriptPostfix)" ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" ItemName="OutputOfExec" />
         </Exec>
         <ItemGroup>
+            <LitGitVariables Include="%(OutputOfExec.Identity)" Condition="$([System.String]::new('%(OutputOfExec.Identity)').Contains('='))" />
             <LitGitFiles Include="$([MSBuild]::MakeRelative($(ProjectDir), %(OutputOfExec.Identity)))" Condition="Exists('%(OutputOfExec.Identity)')" />
         </ItemGroup>
 
         <ItemGroup>
             <LitGitFilesCompilable Include="@(LitGitFiles)" Condition="('%(Extension)' == '.cs') Or ('%(Extension)' == '.vb') Or ('%(Extension)' == '.fs')" />
+            <LitGitFilesProjects Include="@(LitGitFiles)" Condition="('%(Extension)' == '.target') Or ('%(Extension)' == '.props')" />
             <LitGitFilesNone Include="@(LitGitFiles)" Condition="!(('%(Extension)' == '.cs') Or ('%(Extension)' == '.vb') Or ('%(Extension)' == '.fs'))" />
         </ItemGroup>
         <ItemGroup>
@@ -39,8 +46,24 @@
             </None>
             <FileWrites Include="@(LitGitFilesNone.Identity)" />
             <FileWrites Include="%(LitGitFilesCompilable.Identity)" />
+            <FileWrites Include="%(LitGitFilesProjects.Identity)" />
         </ItemGroup>
-        <!--<Warning Text="Compiling: %(LitGitFilesCompilable.Identity)" />
-        <Warning Text="None: %(LitGitFilesNone.Identity)" />-->
+        <CreateProperty Value="$([System.String]::new('%(LitGitVariables.Identity)').Split('=', 2)[1])" >
+            <Output TaskParameter="Value" PropertyName="LITGIT_$([System.String]::new('%(LitGitVariables.Identity)').Split('=', 2)[0])" />
+        </CreateProperty>
+        
+        <PropertyGroup>
+            <AssemblyVersion Condition="$(LitGitDefaultVersioning) == 'True'">$(LITGIT_VERSION_LONG)</AssemblyVersion>
+            <FileVersion Condition="$(LitGitDefaultVersioning) == 'True'">$(LITGIT_VERSION_LONG)</FileVersion>
+            <InformationalVersion Condition="$(LitGitDefaultVersioning) == 'True'">$(LITGIT_INFORMATIONAL_VERSION)</InformationalVersion>
+            <PackageVersion Condition="$(LitGitDefaultVersioning) == 'True'">$(LITGIT_VERSION_FULL)</PackageVersion>
+        </PropertyGroup>
+        
+        <!--
+        <Warning Text="Test for value: $(LITGIT_INFORMATIONAL_VERSION)" />
+        <Warning Text="Vars: %(LitGitVariables.Identity)" />
+        <Warning Text="Compiling: %(LitGitFilesCompilable.Identity)" />
+        <Warning Text="None: %(LitGitFilesNone.Identity)" />
+        -->
     </Target>
 </Project>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    
+    <LitGitTemplateReference Include="VersionInfo.cs.template" />
+    <None Remove="VersionInfo.cs.template" />
+  </ItemGroup>
+  
+  <Import Project="LitGitPackage.target" Condition="Exists('LitGitPackage.target')"/>
+
+  <!--<Target Name="SetLitgitProps" BeforeTargets="BeforeBuild;PreBuildEvent" DependsOnTargets="BuildLitGitVersions">
+    <PropertyGroup>
+        <AssemblyVersion>$(LITGIT_VERSION_LONG)</AssemblyVersion>
+        <FileVersion>$(VERSION_FULL)</FileVersion>
+        <InformationalVersion>$(LITGIT_INFORMATIONAL_VERSION)</InformationalVersion>
+    </PropertyGroup>
+  </Target>-->
+
+</Project>
