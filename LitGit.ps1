@@ -11,6 +11,14 @@ $TOOL_DIRECTORY=(split-path -parent $MyInvocation.MyCommand.Definition)
 $TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY"
 $CONFIG_FILE="$TOOL_DIRECTORY/LitGit.config"
 
+if (Test-Path "$CONFIG_FILE") {
+    [System.Collections.ArrayList]$External_Variables = Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue
+} else {
+    [System.Collections.ArrayList]$External_Variables = @()
+}
+
+
+
 $TEMPLATE_FILES=@()
 $OUTPUT_FILES=@()
 $PARSING_TEMPLATE_FILES=$FALSE
@@ -27,7 +35,9 @@ for ($i=0; $i -lt $args.Length; $i++)
         Write-Host "see https://github.com/jvbsl/LitGit"
         Write-Host ""
         Write-Host "Options:"
-        Write-Host "`t-c, --config <config file>`t`t`tPath to a LitGit configuration file: see https://github.com/jvbsl/LitGit"
+        Write-Host "`t-c, --config <config file>`t`t`tPath to a LitGit configuration file(This can be used more than once, order is kept between config files and parameters):"
+        Write-Host "`t`t`t`t`t`t`t`t see https://github.com/jvbsl/LitGit"
+        Write-Host "`t-p, --parameter `"PARAMETERNAME=VALUE`"`t`tConfiguration property to set(This can be used more than once, order is kept between config files and parameters)"
         Write-Host "`t-s, --searchpath <path>`t`t`t`tPath to a directory in which to search for *.template files. Default is directory of script."
         Write-Host "`t-d, --destination-dir <path>`t`t`tThe output directory to which the templated files are written, if not specified otherwise by (-o | --outputs)."
         Write-Host "`t-t, --templates`t<templatefile1> <templatefile2>`tSpecific *.template files to process corresponding to a specific outputfile declaration."
@@ -44,9 +54,14 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_OUTPUT_FILES=$FALSE
 		$CONFIG_FILE=$args[++$i]
 		if (-Not (Test-Path "$CONFIG_FILE")) {Write-Error "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1;}
+		$External_Variables.AddRange((Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue))
 	}
-	
-    
+	elseif ($key -eq "-p" -Or $key -eq "--parameter")
+	{
+		$PARSING_TEMPLATE_FILES=$FALSE
+		$PARSING_OUTPUT_FILES=$FALSE
+	    $External_Variables.Add($args[++$i])
+	}
     elseif ($key -eq "-s" -Or $key -eq "--searchpath")
 	{
 		$PARSING_TEMPLATE_FILES=$FALSE
@@ -255,7 +270,6 @@ $INFORMATIONAL_VERSION="$VERSION_FULL+${CURRENT_BRANCH}:$CURRENT_COMMIT"
 
 $AVAILABLE_VARIABLES = @{}
 
-$External_Variables = Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue
 foreach ($string in $External_Variables)
 {
 	if ("$string" -Match "=")
@@ -265,6 +279,7 @@ foreach ($string in $External_Variables)
 		$ESCAPED=$TEMP[1].Trim('"') -replace '\$(?!{)','`$'
 		$VALUE=$ExecutionContext.InvokeCommand.ExpandString($ESCAPED)
 		Set-Variable -Name "$NAME" -Value $VALUE
+		if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Config - Set variable '$NAME' = $VALUE" }
 		$AVAILABLE_VARIABLES["$NAME"]=$VALUE
 	}
 }

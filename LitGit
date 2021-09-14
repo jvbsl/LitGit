@@ -10,6 +10,12 @@ TOOL_DIRECTORY="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
 
 TEMPLATE_SEARCH_DIR="$TOOL_DIRECTORY"
 CONFIG_FILE="$TOOL_DIRECTORY/LitGit.config"
+if [ -f "$CONFIG_FILE" ];
+then
+    readarray -t EXTERNAL_VARIABLES < $CONFIG_FILE
+else
+    EXTERNAL_VARIABLES=()
+fi
 
 TEMPLATE_FILES=()
 OUTPUT_FILES=()
@@ -19,7 +25,7 @@ USE_MACHINE_OUTPUT=false
 VERBOSE_OUTPUT=false
 for i in "$@"
 do
-case $i in
+case $1 in
 
     -h|--help)
     echo -e "Usage: LitGit [options]"
@@ -27,7 +33,9 @@ case $i in
     echo -e "see https://github.com/jvbsl/LitGit"
     echo ""
     echo -e "Options:"
-    echo -e "\t-c, --config <config file>\t\t\tPath to a LitGit configuration file: see https://github.com/jvbsl/LitGit"
+    echo -e "\t-c, --config <config file>\t\t\tPath to a LitGit configuration file(This can be used more than once, order is kept between config files and parameters):"
+    echo -e "\t\t\t\t\t\t\t\t see https://github.com/jvbsl/LitGit"
+    echo -e "\t-p, --parameter \"PARAMETERNAME=VALUE\"\t\tConfiguration property to set(This can be used more than once, order is kept between config files and parameters)"
     echo -e "\t-s, --searchpath <path>\t\t\t\tPath to a directory in which to search for *.template files. Default is directory of script."
     echo -e "\t-d, --destination-dir <path>\t\t\tThe output directory to which the templated files are written, if not specified otherwise by (-o | --outputs)."
     echo -e "\t-t, --templates\t<templatefile1> <templatefile2>\tSpecific *.template files to process corresponding to a specific outputfile declaration."
@@ -43,6 +51,16 @@ case $i in
 	PARSING_OUTPUT_FILES=false
     CONFIG_FILE="$2"
 	if [ ! -f "$CONFIG_FILE" ]; then { echo >&2 "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1; } fi
+	readarray -t TMP < $CONFIG_FILE
+	EXTERNAL_VARIABLES+=("${TMP[@]}")
+    shift
+	shift
+    ;;
+    -p|--parameter)
+	PARSING_TEMPLATE_FILES=false
+	PARSING_OUTPUT_FILES=false
+    EXTERNAL_VARIABLES+=("$2")
+    
     shift
 	shift
     ;;
@@ -89,7 +107,7 @@ case $i in
 		then
 			OUTPUT_FILES+=("$1")
 			shift
-		elif [ ! -z $1 ];
+		elif [ ! -z "$1" ];
 		then
 			{ echo >&2 "Error: Invalid Argument: '$1! Aborting." ; exit 1; }
 		fi
@@ -255,10 +273,10 @@ INFORMATIONAL_VERSION=$VERSION_FULL+$CURRENT_BRANCH:$CURRENT_COMMIT
 
 declare -A AVAILABLE_VARIABLES
 
-if [ -f "$CONFIG_FILE" ];
-then
-    IFS="="
-    while read -r name value
+for line in "${EXTERNAL_VARIABLES[@]}"
+do
+
+    while IFS="=" read -r name value
     do
 	    if [ ! -z "$name" ];
 	    then
@@ -266,10 +284,11 @@ then
 		    #expanded=$(echo $expanded)	
 		    expanded=$(echo "'$expanded'")
 		    eval $name=$expanded
+	        $VERBOSE_OUTPUT && echo "[INFO] Config - Set variable '$name' = $expanded"
             AVAILABLE_VARIABLES[$name]=$expanded
 	    fi
-    done < "$CONFIG_FILE"
-fi
+    done < <(printf '%s\n' "$line")
+done
 
 
 [ ${AVAILABLE_VARIABLES[VERSION_SHORT]+abc} ] || VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"
