@@ -51,8 +51,12 @@ case $1 in
 	PARSING_OUTPUT_FILES=false
     CONFIG_FILE="$2"
 	if [ ! -f "$CONFIG_FILE" ]; then { echo >&2 "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1; } fi
-	readarray -t TMP < $CONFIG_FILE
-	EXTERNAL_VARIABLES+=("${TMP[@]}")
+	TMP_CFGFILES=$(find $(dirname "$CONFIG_FILE") -maxdepth 1 -name "$(basename "$CONFIG_FILE")")
+	for CONFIG_FILE in "${TMP_CFGFILES[@]}"
+    do
+	    readarray -t TMP < $CONFIG_FILE
+	    EXTERNAL_VARIABLES+=("${TMP[@]}")
+    done
     shift
 	shift
     ;;
@@ -101,7 +105,8 @@ case $1 in
     *)
     	if [ "$PARSING_TEMPLATE_FILES" = true ];
 		then
-			TEMPLATE_FILES+=("$1")
+	        TMP=$(find $(dirname "$1") -maxdepth 1 -name "$(basename "$1")")
+			TEMPLATE_FILES+=("$TMP")
 			shift
 		elif [ "$PARSING_OUTPUT_FILES" = true ];
 		then
@@ -119,7 +124,7 @@ then
 	{ echo >&2 "Error: Too many output files specified! Aborting." ; exit 1; }
 fi
 if [ ${#TEMPLATE_FILES[@]} -eq 0 ]; then
-	TEMPLATE_FILES=($TEMPLATE_SEARCH_DIR/*.template)
+	TEMPLATE_FILES=$(find $TEMPLATE_SEARCH_DIR -maxdepth 1 -name '*.template')
 fi
 
 for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do

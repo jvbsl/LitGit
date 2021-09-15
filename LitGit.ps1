@@ -1,4 +1,4 @@
-
+Import-Module $PSScriptRoot/Glob.psm1
 
 
 
@@ -16,7 +16,6 @@ if (Test-Path "$CONFIG_FILE") {
 } else {
     [System.Collections.ArrayList]$External_Variables = @()
 }
-
 
 
 $TEMPLATE_FILES=@()
@@ -53,8 +52,12 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_TEMPLATE_FILES=$FALSE
 		$PARSING_OUTPUT_FILES=$FALSE
 		$CONFIG_FILE=$args[++$i]
-		if (-Not (Test-Path "$CONFIG_FILE")) {Write-Error "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1;}
-		$External_Variables.AddRange((Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue))
+		$CONFIG_FILES=GlobSearch -IncludePattern $CONFIG_FILE
+	    if ($CONFIG_FILES.Count -eq 0) {Write-Error "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1;}
+	    foreach($CONFIG_FILE in $CONFIG_FILES)
+	    {
+		    $External_Variables.AddRange((Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue))
+	    }
 	}
 	elseif ($key -eq "-p" -Or $key -eq "--parameter")
 	{
@@ -67,14 +70,14 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_TEMPLATE_FILES=$FALSE
 		$PARSING_OUTPUT_FILES=$FALSE
 		$TEMPLATE_SEARCH_DIR=$args[++$i]
-		if (-Not (Test-Path "$TEMPLATE_SEARCH_DIR")) {Write-Error "Error: Template search directory '$TEMPLATE_SEARCH_DIR' not found! Aborting." ; exit 1;}
+		# TODO: other way to check? if (-Not (Test-Path "$TEMPLATE_SEARCH_DIR")) {Write-Error "Error: Template search directory '$TEMPLATE_SEARCH_DIR' not found! Aborting." ; exit 1;}
 	}
 	
     elseif ($key -eq "-d" -Or $key -eq "--destination-dir")
 	{
 		$PARSING_TEMPLATE_FILES=$FALSE
 		$PARSING_OUTPUT_FILES=$FALSE
-		$TEMPLATE_SEARCH_DIR=$args[++$i]
+		$OUTPUT_DIR=$args[++$i]
 		New-Item "$OUTPUT_DIR" -ItemType Directory -ea stop
 		# mkdir -p "$OUTPUT_DIR" || { Write-Error "Error: Could not create output directory '$OUTPUT_DIR'. Aborting."; exit 1; }
 	}
@@ -119,7 +122,8 @@ if ($OUTPUT_FILES.Length -gt $TEMPLATE_FILES.Length)
 }
 if ($TEMPLATE_FILES.Length -eq 0)
 {
-	$TEMPLATE_FILES+=(Get-ChildItem "$TEMPLATE_SEARCH_DIR/" -Filter "*.template")
+    echo (Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath "*.template")
+	$TEMPLATE_FILES+=(GlobSearch -IncludePattern (Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath "*.template") | Get-ChildItem)
 }
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 {
