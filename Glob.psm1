@@ -1,7 +1,7 @@
 function InstallAndLoadGlobDependency() {
     $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing -ErrorAction SilentlyContinue
     if (-Not $?) {
-        $USE_TEMP_PROVIDER=((Get-PackageSource -ProviderName NuGet -ErrorAction SilentlyContinue) -neq $null)
+        $USE_TEMP_PROVIDER=((Get-PackageSource -ProviderName NuGet -ErrorAction SilentlyContinue) -ne $null)
         if (-Not $USE_TEMP_PROVIDER) {
             Write-Host "Use temporary nuget provider"
             # Register temporary nuget source
