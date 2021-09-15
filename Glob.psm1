@@ -78,7 +78,6 @@ function GlobSearch {
             $FIND_PATTERN=Split-Path $IncludePattern -Leaf
             $FIND_COMMAND=-join("find $FIND_DIR -maxdepth 1 -name '", $FIND_PATTERN, "'");
             $res=bash -c "$FIND_COMMAND"
-            echo $FIND_COMMAND
             if ($?) {
                 return $res
             }
