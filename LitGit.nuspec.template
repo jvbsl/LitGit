@@ -14,7 +14,7 @@
     <files>
         <!-- LitGit Tool -->
         <file src="./LitGit" target="tools/LitGit" />
-        <file src="./Glob.ps1" target="tools/" />
+        <file src="./Glob.psm1" target="tools/" />
         <file src="./LitGit.ps1" target="tools/" />
         <!-- Targets -->
         <file src="LitGit.props" target="build" />
