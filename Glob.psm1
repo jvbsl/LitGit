@@ -1,11 +1,11 @@
 function InstallAndLoadGlobDependency() {
-    $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing
+    $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing -ErrorAction SilentlyContinue
     if (-Not $?) {
-        $USE_TEMP_PROVIDER=(Get-PackageSource -ProviderName NuGet -neq $null)
+        $USE_TEMP_PROVIDER=(Get-PackageSource -ProviderName NuGet -ErrorAction SilentlyContinue -neq $null)
         if (-Not $USE_TEMP_PROVIDER) {
             Write-Host "Use temporary nuget provider"
             # Register temporary nuget source
-            $null = Register-PackageSource -Name tempnuget -ProviderName NuGet -Location "https://api.nuget.org/v3/index.json" -Trusted
+            $null = Register-PackageSource -Name tempnuget -ProviderName NuGet -Location "https://api.nuget.org/v3/index.json" -Trusted -ErrorAction SilentlyContinue
         }
         
         $null = Install-Package -Name Microsoft.Extensions.FileSystemGlobbing -ProviderName NuGet -Scope CurrentUser -RequiredVersion 5.0.0
@@ -17,7 +17,7 @@ function InstallAndLoadGlobDependency() {
         }
         
         if (-Not $USE_TEMP_PROVIDER) {
-            $null = Unregister-PackageSource -Name tempnuget
+            $null = Unregister-PackageSource -Name tempnuget -ErrorAction SilentlyContinue
         }
     }
     
