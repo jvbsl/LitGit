@@ -8,7 +8,7 @@ function InstallAndLoadGlobDependency() {
             $null = Register-PackageSource -Name tempnuget -ProviderName NuGet -Location "https://api.nuget.org/v3/index.json" -Trusted -ErrorAction SilentlyContinue
         }
         
-        $null = Install-Package -Name Microsoft.Extensions.FileSystemGlobbing -ProviderName NuGet -Scope CurrentUser -RequiredVersion 5.0.0
+        $null = Install-Package -Name Microsoft.Extensions.FileSystemGlobbing -ProviderName NuGet -Scope CurrentUser -RequiredVersion 5.0.0 -Force
         if ($?) {
             $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing
         }
