@@ -1,4 +1,4 @@
-Import-Module Glob.psm1
+Import-Module $PSScriptRoot/Glob.psm1
 
 
 
