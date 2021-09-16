@@ -53,7 +53,7 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_OUTPUT_FILES=$FALSE
 		$CONFIG_FILE=$args[++$i]
 		$CONFIG_FILES=GlobSearch -IncludePattern $CONFIG_FILE
-	    if ($CONFIG_FILES.Count -eq 0) {Write-Error "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1;}
+	    if ($CONFIG_FILES.Count -eq 0) {Write-StdErr "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1;}
 	    foreach($CONFIG_FILE in $CONFIG_FILES)
 	    {
 		    $External_Variables.AddRange((Get-Content -Path "$CONFIG_FILE" -ErrorAction SilentlyContinue))
@@ -70,7 +70,7 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_TEMPLATE_FILES=$FALSE
 		$PARSING_OUTPUT_FILES=$FALSE
 		$TEMPLATE_SEARCH_DIR=$args[++$i]
-		# TODO: other way to check? if (-Not (Test-Path "$TEMPLATE_SEARCH_DIR")) {Write-Error "Error: Template search directory '$TEMPLATE_SEARCH_DIR' not found! Aborting." ; exit 1;}
+		# TODO: other way to check? if (-Not (Test-Path "$TEMPLATE_SEARCH_DIR")) {Write-StdErr "Error: Template search directory '$TEMPLATE_SEARCH_DIR' not found! Aborting." ; exit 1;}
 	}
 	
     elseif ($key -eq "-d" -Or $key -eq "--destination-dir")
@@ -79,7 +79,7 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_OUTPUT_FILES=$FALSE
 		$OUTPUT_DIR=$args[++$i]
 		New-Item "$OUTPUT_DIR" -ItemType Directory -ea stop
-		# mkdir -p "$OUTPUT_DIR" || { Write-Error "Error: Could not create output directory '$OUTPUT_DIR'. Aborting."; exit 1; }
+		# mkdir -p "$OUTPUT_DIR" || { Write-StdErr "Error: Could not create output directory '$OUTPUT_DIR'. Aborting."; exit 1; }
 	}
 	elseif ($key -eq "-t" -Or $key -eq "--templates")
 	{
@@ -111,14 +111,14 @@ for ($i=0; $i -lt $args.Length; $i++)
 		}
 		else
 		{
-			Write-Error "Error: Invalid Argument: '$key! Aborting." ; exit 1;
+			Write-StdErr "Error: Invalid Argument: '$key! Aborting." ; exit 1;
 		}
 	}
 }
 
 if ($OUTPUT_FILES.Length -gt $TEMPLATE_FILES.Length)
 {
-	Write-Error "Error: Too many output files specified! Aborting." ; exit 1;
+	Write-StdErr "Error: Too many output files specified! Aborting." ; exit 1;
 }
 if ($TEMPLATE_FILES.Length -eq 0)
 {
@@ -134,7 +134,7 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 {
 	if ($OUTPUT_FILES.Length -le $i)
 	{
-		if (-Not (Test-Path $TEMPLATE_FILES[$i])) {Write-Error "Error: Template file '${$TEMPLATE_FILES[$i]}' not found! Aborting." ; exit 1;}
+		if (-Not (Test-Path $TEMPLATE_FILES[$i])) {Write-StdErr "Error: Template file '${$TEMPLATE_FILES[$i]}' not found! Aborting." ; exit 1;}
 
         $OUTPUT_FILE=$TEMPLATE_FILES[$i]
         if (!$OUTPUT_DIR)
@@ -149,11 +149,11 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 	}
 }
 
-if ($null -eq (Get-Command "git" -ErrorAction SilentlyContinue)  ) { Write-Error "Error: git command not found in PATH. Aborting."; exit 1; }
+if ($null -eq (Get-Command "git" -ErrorAction SilentlyContinue)  ) { Write-StdErr "Error: git command not found in PATH. Aborting."; exit 1; }
 
 
 git rev-parse --git-dir 2>&1 | out-null
-if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in path. Aborting."; exit 1; }
+if ( -Not $LASTEXITCODE -eq 0)  { Write-StdErr "Error: no git repository found in path. Aborting."; exit 1; }
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
 
@@ -170,7 +170,7 @@ if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Verbose output activated" }
 
 $MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
 if ($USE_MACHINE_OUTPUT) {
-    Write-Error "$LAST_TAG $MATCHING_COMMIT"
+    Write-StdErr "$LAST_TAG $MATCHING_COMMIT"
 }
 Write-Host "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 
@@ -208,7 +208,7 @@ else
 }
 
 if (!$USE_MACHINE_OUTPUT){
-    Write-Error "$CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
+    Write-StdErr "$CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
 }
 if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL" }
 
@@ -334,9 +334,9 @@ $AVAILABLE_VARIABLES["COPYRIGHT"]=$COPYRIGHT
 
 
 if ($USE_MACHINE_OUTPUT) {
-    Write-Error $AVAILABLE_VARIABLES.count
+    Write-StdErr $AVAILABLE_VARIABLES.count
     foreach ($h in $AVAILABLE_VARIABLES.GetEnumerator()) {
-        Write-Error "$($h.Name)=$($h.Value)"
+        Write-StdErr "$($h.Name)=$($h.Value)"
     }
 }
 
@@ -355,7 +355,7 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
     if (-Not (Test-Path "$INPUT_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
     if ($USE_MACHINE_OUTPUT) {
-	    Write-Error "$OUTPUT_FILE"
+	    Write-StdErr "$OUTPUT_FILE"
     }
     Write-Host "Create templated file $OUTPUT_FILE..."
 	expandVarsStrict "$INPUT_FILE" "$OUTPUT_FILE"
