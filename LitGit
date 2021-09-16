@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echoerr(){ >&2 echo $@; }
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   TOOL_DIRECTORY="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
@@ -170,10 +170,9 @@ $VERBOSE_OUTPUT && echo "[INFO] Verbose output activated"
 
 MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
 if [ "$USE_MACHINE_OUTPUT" = "true" ]; then
-    echo "$LAST_TAG $MATCHING_COMMIT"
-else
-    echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+    echoerr "$LAST_TAG $MATCHING_COMMIT"
 fi
+echo "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
 
 # git cat-file -p $MATCHING_COMMIT
 
@@ -207,11 +206,11 @@ else
 	BASE_VERSION=$LAST_TAG
 fi
 
-if [ ! "$USE_MACHINE_OUTPUT" = "true" ]; then
-    echo "Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
-else
-    $VERBOSE_OUTPUT && echo "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
+if [ "$USE_MACHINE_OUTPUT" = "true" ]; then
+    echoerr "$CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
 fi
+
+$VERBOSE_OUTPUT && echo "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
 
 TEMP_VERSION=( ${BASE_VERSION//./ } )
 VERSION_MAJOR=${TEMP_VERSION[0]}
@@ -334,9 +333,9 @@ AVAILABLE_VARIABLES[COPYRIGHT]=$COPYRIGHT
 
 if [ "$USE_MACHINE_OUTPUT" = "true" ];
 then
-    echo "${#AVAILABLE_VARIABLES[@]}"
+    echoerr "${#AVAILABLE_VARIABLES[@]}"
     for varName in "${!AVAILABLE_VARIABLES[@]}"; do
-        echo "$varName=${AVAILABLE_VARIABLES[$varName]}"
+        echoerr "$varName=${AVAILABLE_VARIABLES[$varName]}"
     done
 fi
 
@@ -357,9 +356,8 @@ for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
 
     if [ "$USE_MACHINE_OUTPUT" = "true" ];
     then
-        echo "$OUTPUT_FILE"
-    else
-	    echo "Create templated file $OUTPUT_FILE..."
+        echoerr "$OUTPUT_FILE"
     fi
+    echo "Create templated file $OUTPUT_FILE..."
 	expandVarsStrict < "$INPUT_FILE" >"$OUTPUT_FILE"
 done

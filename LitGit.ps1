@@ -170,10 +170,10 @@ if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Verbose output activated" }
 
 $MATCHING_COMMIT=$(git rev-parse $LAST_TAG)
 if ($USE_MACHINE_OUTPUT) {
-    Write-Host "$LAST_TAG $MATCHING_COMMIT"
-} else {
-    Write-Host "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+    Write-Error "$LAST_TAG $MATCHING_COMMIT"
 }
+Write-Host "Last Tag: $LAST_TAG on commit $MATCHING_COMMIT"
+
 
 # git cat-file -p $MATCHING_COMMIT
 
@@ -208,10 +208,10 @@ else
 }
 
 if (!$USE_MACHINE_OUTPUT){
-    Write-Host "Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
-} else {
-    if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL" }
+    Write-Error "$CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL"
 }
+if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Current Branch: $CURRENT_BRANCH -> $BASE_VERSION*$VERSION_ADDITIONAL" }
+
 $TEMP_VERSION=$BASE_VERSION.Split(".", 4 , [StringSplitOptions]"None")
 $VERSION_MAJOR=$TEMP_VERSION[0]
 $VERSION_MINOR=$TEMP_VERSION[1]
@@ -334,9 +334,9 @@ $AVAILABLE_VARIABLES["COPYRIGHT"]=$COPYRIGHT
 
 
 if ($USE_MACHINE_OUTPUT) {
-    Write-Host $AVAILABLE_VARIABLES.count
+    Write-Error $AVAILABLE_VARIABLES.count
     foreach ($h in $AVAILABLE_VARIABLES.GetEnumerator()) {
-        Write-Host "$($h.Name)=$($h.Value)"
+        Write-Error "$($h.Name)=$($h.Value)"
     }
 }
 
@@ -355,9 +355,8 @@ for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
     if (-Not (Test-Path "$INPUT_FILE")) { continue }
 	$OUTPUT_FILE=$OUTPUT_FILES[$i]
     if ($USE_MACHINE_OUTPUT) {
-	    Write-Host "$OUTPUT_FILE"
-    } else {
-        Write-Host "Create templated file $OUTPUT_FILE..."
+	    Write-Error "$OUTPUT_FILE"
     }
+    Write-Host "Create templated file $OUTPUT_FILE..."
 	expandVarsStrict "$INPUT_FILE" "$OUTPUT_FILE"
 }
