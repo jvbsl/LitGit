@@ -151,6 +151,12 @@ git rev-parse --git-dir 2>&1 | out-null
 if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in path. Aborting."; exit 1; }
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
+while(-Not ($LAST_TAG -Match "^([0-9]\.)*[0-9]$")) {
+    $LAST_TAG=(git describe --abbrev=0 --tags $LAST_TAG^)
+}
+
+
+
 $CURRENT_COMMIT=(git log -1 --pretty="%H")
 
 if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Verbose output activated" }
