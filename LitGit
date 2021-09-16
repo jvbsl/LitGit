@@ -55,7 +55,7 @@ case $1 in
 	while IFS=  read -r -d $'\0'; do
 	    readarray -t TMP < $REPLY
 	    EXTERNAL_VARIABLES+=("${TMP[@]}")
-	done < <(find $(dirname "$CONFIG_FILE") -maxdepth 1 -name "$(basename "$CONFIG_FILE") -print0")
+	done < <(find $(dirname "$CONFIG_FILE") -maxdepth 1 -name "$(basename "$CONFIG_FILE") -print0" 2> /dev/null)
 
     shift
 	shift
@@ -107,7 +107,7 @@ case $1 in
 		then
 	        while IFS=  read -r -d $'\0'; do
 			    TEMPLATE_FILES+=("$TMP")
-		    done < <(find $(dirname "$1") -maxdepth 1 -name "$(basename "$1") -print0")
+		    done < <(find $(dirname "$1") -maxdepth 1 -name "$(basename "$1") -print0" 2> /dev/null)
 			shift
 		elif [ "$PARSING_OUTPUT_FILES" = true ];
 		then
@@ -128,7 +128,7 @@ if [ ${#TEMPLATE_FILES[@]} -eq 0 ]; then
     TEMPLATE_FILES=()
     while IFS=  read -r -d $'\0'; do
         TEMPLATE_FILES+=("$REPLY")
-    done < <(find $TEMPLATE_SEARCH_DIR -maxdepth 1 -name '*.template' -print0)
+    done < <(find $TEMPLATE_SEARCH_DIR -maxdepth 1 -name '*.template' -print0 2> /dev/null)
 fi
 
 for ((i=0; i< ${#TEMPLATE_FILES[@]} ;i++)); do
