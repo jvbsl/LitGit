@@ -156,6 +156,14 @@ git rev-parse --git-dir 2>&1 | out-null
 if ( -Not $LASTEXITCODE -eq 0)  { Write-Error "Error: no git repository found in path. Aborting."; exit 1; }
 
 $LAST_TAG=(git describe --abbrev=0 --tags)
+
+while(-Not ($LAST_TAG -Match "^([0-9]+\.)*[0-9]+\-*.*?$"))
+{
+    $LAST_TAG=(git describe --abbrev=0 --tags $LAST_TAG^)
+}
+
+
+
 $CURRENT_COMMIT=(git log -1 --pretty="%H")
 
 if ($VERBOSE_OUTPUT) {  Write-Host "[INFO] Verbose output activated" }
@@ -268,8 +276,9 @@ function expandVarsStrict
 
 if ("$VERSION_REVISION".Length -eq 0)
 {
-    $VERSION_REVISION=(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object -Line).Lines
+    $VERSION_REVISION=0
 }
+$VERSION_REVISION=[int]$VERSION_REVISION+(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object -Line).Lines
 
 $VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"
 $VERSION_SHORT_BUILD="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_BUILD"

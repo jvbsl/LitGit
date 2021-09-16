@@ -159,6 +159,11 @@ git rev-parse --git-dir >/dev/null 2>&1 || { echo >&2 "Error: no git repository 
 
 
 LAST_TAG=$(git describe --abbrev=0 --tags)
+
+while [[ $(echo $LAST_TAG | grep -Eo "^([0-9]+\.)*[0-9]+\-*.*?$") != $LAST_TAG ]]; do
+    LAST_TAG=$(git describe --abbrev=0 --tags $LAST_TAG^)
+done
+
 CURRENT_COMMIT=$(git log -1 --pretty="%H")
 
 $VERBOSE_OUTPUT && echo "[INFO] Verbose output activated"
@@ -271,9 +276,9 @@ expandVarsStrict(){
 
 if [ -z "$VERSION_REVISION" ];
 then
-    VERSION_REVISION=$(git log --no-merges --oneline $MATCHING_COMMIT... | wc -l)
+    VERSION_REVISION=0
 fi
-
+VERSION_REVISION=$(( $VERSION_REVISION + $(git log --no-merges --oneline $MATCHING_COMMIT... | wc -l) ))
 VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"
 VERSION_SHORT_BUILD="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_BUILD"
 VERSION_LONG="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_BUILD.$VERSION_REVISION"
