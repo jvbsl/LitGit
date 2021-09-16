@@ -33,3 +33,5 @@ mkdir -p $TOOLS_DIR
 curl -o "$NUGET" $ZFLAG "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 
 $MONO $NUGET pack LitGit.nuspec -OutputDirectory output
+
+tar -czvf ./output/litgit.tar.gz LitGit LitGit.ps1 Glob.psm1
