@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - feature/actions
+      - feature/gh-release
   pull_request:
 jobs:
   build:
