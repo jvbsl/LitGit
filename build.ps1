@@ -18,3 +18,5 @@ if(!$IsWindows)
 }
 
 &$NUGET $ADDITIONAL_ARGS pack LitGit.nuspec -OutputDirectory output
+
+tar -czvf ./output/litgit.tar.gz LitGit LitGit.ps1 Glob.psm1
