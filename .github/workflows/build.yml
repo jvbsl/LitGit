@@ -37,7 +37,7 @@ jobs:
     - name: Deploy Nuget Package
       run: ./tools/nuget push ./output/*.nupkg -ApiKey $NUGET_API_KEY -Source https://api.nuget.org/v3/index.json -SkipDuplicate
       shell: bash
-      if: matrix.os == 'windows-latest' && github.event_name != 'pull_request'
+      if: matrix.os == 'windows-latest' && github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
