@@ -122,9 +122,14 @@ if ($OUTPUT_FILES.Length -gt $TEMPLATE_FILES.Length)
 }
 if ($TEMPLATE_FILES.Length -eq 0)
 {
-    echo (Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath "*.template")
+    # echo (Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath "*.template")
 	$TEMPLATE_FILES+=(GlobSearch -IncludePattern (Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath "*.template") | Get-ChildItem)
 }
+
+
+
+
+
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
 {
 	if ($OUTPUT_FILES.Length -le $i)

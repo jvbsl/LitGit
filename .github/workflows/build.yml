@@ -25,7 +25,10 @@ jobs:
       run: ./build.sh
       if: matrix.os == 'ubuntu-latest'
     - name: Build Windows
-      run: .\build.ps1
+      id: winbuild
+      run: |
+        .\build.ps1
+        echo "::set-output name=LITGIT_VERSION_FULL::$(cat LitGit.FullVersion)"
       if: matrix.os == 'windows-latest'
     - name: Run tests
       run: ./test.sh
@@ -41,7 +44,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
+        tag_name: ${{ steps.winbuild.outputs.LITGIT_VERSION_FULL }}
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: ${{ github.ref != 'refs/heads/master' }}
