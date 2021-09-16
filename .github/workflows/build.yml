@@ -45,7 +45,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.winbuild.outputs.LITGIT_VERSION_FULL }}
-        release_name: Release ${{ github.ref }}
+        release_name: Release ${{ steps.winbuild.outputs.LITGIT_VERSION_FULL }} on ${{ github.ref }}
         draft: false
         prerelease: ${{ github.ref != 'refs/heads/master' }}
       if: matrix.os == 'windows-latest' && github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
