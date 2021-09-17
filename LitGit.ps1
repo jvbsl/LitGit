@@ -128,8 +128,9 @@ if ($TEMPLATE_FILES.Length -eq 0)
 
 $TMP=$TEMPLATE_FILES
 $TEMPLATE_FILES=@()
-for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++) {
-    $TEMPLATE_FILES+=(GlobSearch -IncludePattern (Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath $TMP[$i]) | Get-ChildItem)
+for ($i=0; $i -lt $TMP.Length ;$i++) {
+    $pattern=if ([System.IO.Path]::IsPathRooted($TMP[$i])) { $TMP[$i] } else { Join-Path -Path $TEMPLATE_SEARCH_DIR -ChildPath $TMP[$i] }
+    $TEMPLATE_FILES+=(GlobSearch -IncludePattern $pattern | Get-ChildItem)
 }
 
 for ($i=0; $i -lt $TEMPLATE_FILES.Length ;$i++)
