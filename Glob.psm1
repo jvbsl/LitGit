@@ -72,17 +72,17 @@ function GlobSearch {
         [string]$IncludePattern
     )
     
-    try {
-        if (Get-Command bash -ErrorAction Ignore) {
-            $FIND_DIR=Split-Path $IncludePattern
-            $FIND_PATTERN=Split-Path $IncludePattern -Leaf
-            $FIND_COMMAND=-join("find $FIND_DIR -maxdepth 1 -name '", $FIND_PATTERN, "'");
-            $res=bash -c "$FIND_COMMAND"
-            if ($?) {
-                return $res
-            }
-        }
-    }catch {}
+    #try {
+    #    if (Get-Command bash -ErrorAction Ignore) {
+    #        $FIND_DIR=Split-Path $IncludePattern
+    #        $FIND_PATTERN=Split-Path $IncludePattern -Leaf
+    #        $FIND_COMMAND=-join("find $FIND_DIR -maxdepth 1 -name '", $FIND_PATTERN, "'");
+    #        $res=bash -c "$FIND_COMMAND"
+    #        if ($?) {
+    #            return $res
+    #        }
+    #    }
+    #}catch {}
     
     InstallAndLoadGlobDependency
     
