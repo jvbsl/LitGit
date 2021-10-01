@@ -78,7 +78,7 @@ for ($i=0; $i -lt $args.Length; $i++)
 		$PARSING_TEMPLATE_FILES=$FALSE
 		$PARSING_OUTPUT_FILES=$FALSE
 		$OUTPUT_DIR=$args[++$i]
-		New-Item "$OUTPUT_DIR" -ItemType Directory -ea stop
+		New-Item "$OUTPUT_DIR" -ItemType Directory -Force -ea stop
 		# mkdir -p "$OUTPUT_DIR" || { Write-StdErr "Error: Could not create output directory '$OUTPUT_DIR'. Aborting."; exit 1; }
 	}
 	elseif ($key -eq "-t" -Or $key -eq "--templates")
