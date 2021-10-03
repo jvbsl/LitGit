@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf ../output/*
-rm -rf packages/*
+rm -rf packages/litgit/*
 
 pushd ..
 
