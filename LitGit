@@ -219,9 +219,9 @@ VERSION_BUILD=${TEMP_VERSION[2]}
 VERSION_REVISION=${TEMP_VERSION[3]}
 
 if [ -z "$VERSION_MAJOR" ]; then VERSION_MAJOR="0"; fi
-if [ -z "$VERSION_MINOR" ]; then VERSION_MAJOR="0"; fi
-if [ -z "$VERSION_BUILD" ]; then VERSION_MAJOR="0"; fi
-if [ -z "$VERSION_REVISION" ]; then VERSION_MAJOR="0"; fi
+if [ -z "$VERSION_MINOR" ]; then VERSION_MINOR="0"; fi
+if [ -z "$VERSION_BUILD" ]; then VERSION_BUILD="0"; fi
+if [ -z "$VERSION_REVISION" ]; then VERSION_REVISION="0"; fi
 
 
 INITIAL_COMMIT=$(git rev-list --max-parents=0 HEAD)
