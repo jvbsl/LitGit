@@ -221,6 +221,11 @@ $VERSION_MINOR=$TEMP_VERSION[1]
 $VERSION_BUILD=$TEMP_VERSION[2]
 $VERSION_REVISION=$TEMP_VERSION[3]
 
+if ("$VERSION_MAJOR".Length -eq 0) { $VERSION_MAJOR="0" }
+if ("$VERSION_MINOR".Length -eq 0) { $VERSION_MINOR="0" }
+if ("$VERSION_BUILD".Length -eq 0) { $VERSION_BUILD="0" }
+if ("$VERSION_REVISION".Length -eq 0) { $VERSION_REVISION="0" }
+
 $INITIAL_COMMIT=(git rev-list --max-parents=0 HEAD)
 
 $REMOTE_URL=((git remote get-url --all origin 2> $null) | Select-Object -first 1)
@@ -277,10 +282,6 @@ function expandVarsStrict
 }
 
 
-if ("$VERSION_REVISION".Length -eq 0)
-{
-    $VERSION_REVISION=0
-}
 $VERSION_REVISION=[int]$VERSION_REVISION+(git log --no-merges --oneline "$MATCHING_COMMIT..." | Measure-Object -Line).Lines
 
 $VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"

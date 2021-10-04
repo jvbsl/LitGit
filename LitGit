@@ -218,6 +218,12 @@ VERSION_MINOR=${TEMP_VERSION[1]}
 VERSION_BUILD=${TEMP_VERSION[2]}
 VERSION_REVISION=${TEMP_VERSION[3]}
 
+if [ -z "$VERSION_MAJOR" ]; then VERSION_MAJOR="0"; fi
+if [ -z "$VERSION_MINOR" ]; then VERSION_MAJOR="0"; fi
+if [ -z "$VERSION_BUILD" ]; then VERSION_MAJOR="0"; fi
+if [ -z "$VERSION_REVISION" ]; then VERSION_MAJOR="0"; fi
+
+
 INITIAL_COMMIT=$(git rev-list --max-parents=0 HEAD)
 
 REMOTE_URL=$(git remote get-url --all origin 2> /dev/null | head -n 1)
@@ -273,10 +279,9 @@ expandVarsStrict(){
 
 
 
-if [ -z "$VERSION_REVISION" ];
-then
-    VERSION_REVISION=0
-fi
+
+
+
 VERSION_REVISION=$(( $VERSION_REVISION + $(git log --no-merges --oneline $MATCHING_COMMIT... | wc -l) ))
 VERSION_SHORT="$VERSION_MAJOR.$VERSION_MINOR"
 VERSION_SHORT_BUILD="$VERSION_MAJOR.$VERSION_MINOR.$VERSION_BUILD"
