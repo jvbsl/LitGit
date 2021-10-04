@@ -53,10 +53,10 @@
         </CreateProperty>
         
         <PropertyGroup>
-            <AssemblyVersion Condition="$(LitGitDefaultVersioning) == True">$(LITGIT_VERSION_LONG)</AssemblyVersion>
-            <FileVersion Condition="$(LitGitDefaultVersioning) == True">$(LITGIT_VERSION_LONG)</FileVersion>
-            <InformationalVersion Condition="$(LitGitDefaultVersioning) == True">$(LITGIT_INFORMATIONAL_VERSION)</InformationalVersion>
-            <PackageVersion Condition="$(LitGitDefaultVersioning) == True">$(LITGIT_VERSION_FULL)</PackageVersion>
+            <AssemblyVersion Condition="$(LitGitDefaultVersioning) == True And '$(AssemblyVersion)' == ''">$(LITGIT_VERSION_LONG)</AssemblyVersion>
+            <FileVersion Condition="$(LitGitDefaultVersioning) == True And '$(FileVersion)' == ''">$(LITGIT_VERSION_LONG)</FileVersion>
+            <InformationalVersion Condition="$(LitGitDefaultVersioning) == True And '$(InformationalVersion)' == ''">$(LITGIT_INFORMATIONAL_VERSION)</InformationalVersion>
+            <PackageVersion Condition="$(LitGitDefaultVersioning) == True And '$(PackageVersion)' == ''">$(LITGIT_VERSION_FULL)</PackageVersion>
             <RepositoryUrl Condition="$(LitGitDefaultVersioning) == True And $(LitGitIncludeProjectUrl) == True">$(LITGIT_PROJECT_URL)</RepositoryUrl>
         </PropertyGroup>
         
