@@ -99,7 +99,7 @@ for ($i=0; $i -lt $args.Length; $i++)
 	{
 		$VERBOSE_OUTPUT=$TRUE
 	}
-	else
+	elseif ($key)
 	{
     	if ($PARSING_TEMPLATE_FILES)
 		{
