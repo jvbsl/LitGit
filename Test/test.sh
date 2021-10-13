@@ -15,9 +15,9 @@ case "${unameOut}" in
 esac
 
 if [ "$machine" == "Win" ]; then
-    pwsh ./build.ps1
+    powershell.exe ./build.ps1
     VERSION=$(ls ./output/*)
-    VERSION=$(pwsh -command "[regex]::match(\"$VERSION\", \".*LitGit.(.*?).nupkg\").Groups[1].Value")
+    VERSION=$(powershell.exe -command "[regex]::match(\"$VERSION\", \".*LitGit.(.*?).nupkg\").Groups[1].Value")
 else
     ./build.sh
     VERSION=$(ls ./output/* | grep -oP '(?<=LitGit.).*(?=.nupkg)')

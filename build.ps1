@@ -11,7 +11,7 @@ New-Item -ItemType Directory -Force -Path $TOOLS_DIR
 (new-object System.Net.WebClient).DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", $NUGET)
 
 
-if(!$IsWindows)
+if(!([System.Environment]::OSVersion.Platform -eq "Win32NT"))
 {
     $ADDITIONAL_ARGS=$NUGET
     $NUGET="mono"
