@@ -1,5 +1,7 @@
 function InstallAndLoadGlobDependency() {
-    Write-Host (Get-Module -ListAvailable)
+    $packagemanagement_module = (Get-Module -ListAvailable PackageManagement -PSEdition $PSEdition -ErrorAction SilentlyContinue)
+    if (-Not $packagemanagement_module) { $packagemanagement_module = (Get-Module -ListAvailable PackageManagement -ErrorAction SilentlyContinue) }
+    Import-Module -ModuleInfo $packagemanagement_module
     $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing -ErrorAction SilentlyContinue
     if (-Not $?) {
 		$null = Install-Package -Source "https://api.nuget.org/v3/index.json" -Name Microsoft.Extensions.FileSystemGlobbing -Scope CurrentUser -RequiredVersion 5.0.0 -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
