@@ -1,4 +1,5 @@
 function InstallAndLoadGlobDependency() {
+    Write-Host (Get-Module -ListAvailable)
     $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing -ErrorAction SilentlyContinue
     if (-Not $?) {
 		$null = Install-Package -Source "https://api.nuget.org/v3/index.json" -Name Microsoft.Extensions.FileSystemGlobbing -Scope CurrentUser -RequiredVersion 5.0.0 -Force -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
@@ -62,7 +63,6 @@ function SplitPattern {
     }
     return $Directory.Substring(0, $ind + 1), $Directory.Substring($ind + 1, $Directory.Length - $ind - 1);
 }
-
 function GlobSearch {
     param (
         [string]$IncludePattern
@@ -79,7 +79,6 @@ function GlobSearch {
     #        }
     #    }
     #}catch {}
-    
     InstallAndLoadGlobDependency
     
     $p1,$p2 = SplitPattern -Directory $IncludePattern
