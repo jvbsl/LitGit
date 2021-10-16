@@ -63,7 +63,7 @@ case $1 in
 	PARSING_TEMPLATE_FILES=false
 	PARSING_OUTPUT_FILES=false
     CONFIG_FILE="$2"
-	if [ ! -f "$CONFIG_FILE" ]; then { echo >&2 "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1; } fi
+	# if [ ! -f "$CONFIG_FILE" ]; then { echo >&2 "Error: Configfile '$CONFIG_FILE' not found! Aborting." ; exit 1; } fi
 
 	while IFS=  read -r ; do
 	    readarray -t TMP < $REPLY
