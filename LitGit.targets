@@ -23,7 +23,7 @@
     </PropertyGroup>-->
     <Target Name="BuildLitGitVersions" BeforeTargets="BeforeBuild;PreBuildEvent" Inputs="@(LitGitTemplates);FAKE_INPUT" Outputs="@(LitGitTemplates->'%(rootdir)%(directory)%(filename)');FAKE_OUTPUT">
     
-        <Exec Command="$(ScriptExe) $(ScriptPrefix)$(LitGit) -s  $(MSBuildProjectDirectory) $(LitGitVerboseOutputAppendix) -m -t '%(LitGitTemplates.FullPath)'$(ScriptPostfix)" ConsoleToMSBuild="true">
+        <Exec Command="$(ScriptExe) $(ScriptPrefix)$(LitGit) -s '$(MSBuildProjectDirectory)' $(LitGitVerboseOutputAppendix) -m -t '%(LitGitTemplates.FullPath)'$(ScriptPostfix)" ConsoleToMSBuild="true">
             <Output TaskParameter="ConsoleOutput" ItemName="OutputOfExec" />
         </Exec>
         <ItemGroup>
