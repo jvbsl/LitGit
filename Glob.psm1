@@ -1,6 +1,6 @@
 function InstallAndLoadGlobDependency() {
-    $packagemanagement_module = (Get-Module -ListAvailable PackageManagement -PSEdition $PSEdition -ErrorAction SilentlyContinue)
-    if (-Not $packagemanagement_module) { $packagemanagement_module = (Get-Module -ListAvailable PackageManagement -ErrorAction SilentlyContinue) }
+    $packagemanagement_module = (Get-Module -ListAvailable PackageManagement -PSEdition $PSEdition -ErrorAction SilentlyContinue) | Select -First 1
+    if (-Not $packagemanagement_module) { $packagemanagement_module = (Get-Module -ListAvailable PackageManagement -ErrorAction SilentlyContinue) | Select -First 1 }
     Import-Module -ModuleInfo $packagemanagement_module
     $SysGlobbingPackage=Get-Package -Name Microsoft.Extensions.FileSystemGlobbing -ErrorAction SilentlyContinue
     if (-Not $?) {
